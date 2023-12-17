@@ -1,9 +1,12 @@
 package gestion.cosit.gestionDepense.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 @Data
 @Entity
@@ -16,25 +19,24 @@ public class Depense {
     @Column(length = 255, nullable = false)
     private String libelle;
 
+//    @Column(nullable = true)
+//    private  String image;
+
     @Column(length = 255, nullable = false)
     private String description;
 
     @Column(length = 255, nullable = false)
     private double montantDepense;
 
-    @Column(length = 255, nullable = false)
-    private double montantPlafondRestant;
 
-    @Column(length = 255, nullable = false)
-    private double montantPlafond;
-
-    @Temporal(TemporalType.DATE)
+    @NotNull(message = "Désolé, la date ne doit pas être null")
     @Column(nullable = false)
-    private LocalDate dateDepense;
+    @JsonFormat(pattern="yyyy-MM-dd")
+    private Date dateDepense;
 
 
     @ManyToOne
-    @JoinColumn(name = "personnel_id")  // Nom de la colonne qui stocke la clé étrangère dans la table Depense
+    @JoinColumn(name = "utilisateur_id")
     private Utilisateur utilisateur;
 
 
@@ -47,4 +49,6 @@ public class Depense {
     @ManyToOne
     private Bureau bureau;
 
+    @ManyToOne
+    private Budget budget;
 }

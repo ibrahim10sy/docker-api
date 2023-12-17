@@ -22,8 +22,7 @@ public class Demande {
     @Column(nullable = false)
     private double montantDemande;
 
-    @NotNull(message = "Désolé, la date ne doit pas être null")
-    @Column(nullable = false)
+
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date dateDemande;
 

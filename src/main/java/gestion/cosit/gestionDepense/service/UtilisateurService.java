@@ -25,14 +25,14 @@ public class UtilisateurService {
     public Utilisateur createUser(Utilisateur utilisateur, MultipartFile multipartFile) throws Exception {
         if(utilisateurRepository.findByEmail(utilisateur.getEmail()) == null){
             if(multipartFile != null){
-                String location = "C:\\xampp\\htdocs\\demarche";
+                String location = "C:\\xampp\\htdocs\\cosit";
                 try{
                     Path rootlocation = Paths.get(location);
                     if(!Files.exists(rootlocation)){
                         Files.createDirectories(rootlocation);
                         Files.copy(multipartFile.getInputStream(),
                                 rootlocation.resolve(multipartFile.getOriginalFilename()));
-                        utilisateur.setImage("hdemarche/"
+                        utilisateur.setImage("cosit/"
                                 +multipartFile.getOriginalFilename());
                     }else{
                         try {
@@ -41,12 +41,12 @@ public class UtilisateurService {
                             if(!Files.exists(name)){
                                 Files.copy(multipartFile.getInputStream(),
                                         rootlocation.resolve(multipartFile.getOriginalFilename()));
-                                utilisateur.setImage("hdemarche/"
+                                utilisateur.setImage("cosit/"
                                         +multipartFile.getOriginalFilename());
                             }else{
                                 Files.delete(name);
                                 Files.copy(multipartFile.getInputStream(),rootlocation.resolve(multipartFile.getOriginalFilename()));
-                                utilisateur.setImage("hdemarche/"
+                                utilisateur.setImage("cosit/"
                                         +multipartFile.getOriginalFilename());
                             }
                         }catch (Exception e){
@@ -99,14 +99,14 @@ public class UtilisateurService {
 
 
         if(multipartFile != null){
-            String location = "C:\\xampp\\htdocs\\demarche";
+            String location = "C:\\xampp\\htdocs\\cosit";
             try{
                 Path rootlocation = Paths.get(location);
                 if(!Files.exists(rootlocation)){
                     Files.createDirectories(rootlocation);
                     Files.copy(multipartFile.getInputStream(),
                             rootlocation.resolve(multipartFile.getOriginalFilename()));
-                    user.setImage("demarche/"
+                    user.setImage("cosit/"
                             +multipartFile.getOriginalFilename());
                 }else{
                     try {
@@ -115,12 +115,12 @@ public class UtilisateurService {
                         if(!Files.exists(name)){
                             Files.copy(multipartFile.getInputStream(),
                                     rootlocation.resolve(multipartFile.getOriginalFilename()));
-                            user.setImage("demarche/"
+                            user.setImage("cosit/"
                                     +multipartFile.getOriginalFilename());
                         }else{
                             Files.delete(name);
                             Files.copy(multipartFile.getInputStream(),rootlocation.resolve(multipartFile.getOriginalFilename()));
-                            user.setImage("demarche/"
+                            user.setImage("cosit/"
                                     +multipartFile.getOriginalFilename());
                         }
                     }catch (Exception e){

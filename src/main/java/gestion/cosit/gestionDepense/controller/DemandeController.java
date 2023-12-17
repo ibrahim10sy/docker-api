@@ -45,9 +45,9 @@ public class DemandeController {
         return new ResponseEntity<>(demandeService.approuveByAdmin(demande,id), HttpStatus.OK);
     }
 
-    @GetMapping("read/{idPersonnel}")
+    @GetMapping("read/{idUtilisateur}")
     @Operation(summary = "Liste des demande ")
-    public ResponseEntity<List<Demande>> getAllByPersonnel(@PathVariable long idUtilisateur){
+    public ResponseEntity<List<Demande>> getAllByUtilisateur(@PathVariable long idUtilisateur){
         return new ResponseEntity<>(demandeService.getAllDemandeByIdUtilisateur(idUtilisateur), HttpStatus.OK);
     }
 

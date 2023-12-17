@@ -1,0 +1,80 @@
+package gestion.cosit.gestionDepense.controller;
+
+import gestion.cosit.gestionDepense.model.Budget;
+import gestion.cosit.gestionDepense.repository.BudgetRepository;
+import gestion.cosit.gestionDepense.service.BudgetService;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
+import org.apache.coyote.BadRequestException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/Budget")
+public class BudgetController {
+
+    @Autowired
+    BudgetService budgetService;
+
+    @Autowired
+    BudgetRepository budgetRepository;
+
+//    @PostMapping("/ajouter")
+//    @Operation(summary = "Creation d'un budget")
+//    public ResponseEntity<Budget> ajouterBudget(@Valid @RequestBody Budget budget) throws BadRequestException {
+//        System.out.println("Budget controller "+budget);
+//        return new ResponseEntity<>(budgetService.createBudget(budget), HttpStatus.OK);
+//    }
+    @PostMapping("/ajouter")
+    public ResponseEntity<Budget> ajouterBudget(@Valid @RequestBody Budget budget) throws BadRequestException {
+    System.out.println("Budget controller " + budget);
+
+    Budget createdBudget = budgetService.createBudget(budget);
+    return new ResponseEntity<>(createdBudget, HttpStatus.OK);
+}
+    @PostMapping("/allouer-mensuellement")
+    public ResponseEntity<String> allocateBudgetMonthlyManually() {
+        try {
+            budgetService.allocateBudgetMonthly();
+            return new ResponseEntity<>("Allocation mensuelle effectuée avec succès.", HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace(); // Enregistrez l'exception
+            return new ResponseEntity<>("Erreur lors de l'allocation mensuelle.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @PutMapping("/modifier/{id}")
+    @Operation(summary = "Modification d'un  d'un budget")
+    public ResponseEntity<Budget> modifierBudget(@Valid @RequestBody Budget budget, @PathVariable long id){
+        return  new ResponseEntity<>(budgetService.updateBudget(budget,id), HttpStatus.OK);
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "Affichage la liste  des budgets")
+    public ResponseEntity<List<Budget>> listeBudget(){
+        return  new ResponseEntity<>(budgetService.allBudget(),HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Rechercher un budget par sa description")
+    public ResponseEntity<List<Budget>> searchBudgetByDesc( @RequestParam("desc") String desc){
+        return  new ResponseEntity<>(budgetService.searchBudget(desc),HttpStatus.OK);
+    }
+
+    @GetMapping("/trie")
+    @Operation(summary = "Trier les budget par mois et annÃ©e")
+    public ResponseEntity<List<Budget>> sortByMonthAndYear(@RequestParam("date") String date){
+        return  new ResponseEntity<>(budgetService.sortBudgetByMonthAndYear(date),HttpStatus.OK);
+    }
+
+    @DeleteMapping("/supprimer/{idBudget}")
+    @Operation(summary = "suppression d'un  budget")
+    public ResponseEntity<String> supprimerBudget(@PathVariable long idBudget) throws BadRequestException {
+        return new ResponseEntity<>(budgetService.deleteBudget(idBudget),HttpStatus.OK);
+    }
+}

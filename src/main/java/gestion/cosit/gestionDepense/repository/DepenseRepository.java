@@ -14,6 +14,7 @@ public interface DepenseRepository extends JpaRepository<Depense,Long> {
 
     Depense findByIdDepense(long id);
     List<Depense> findByUtilisateurAndDateDepenseBetween(Utilisateur utilisateur, LocalDate startDate, LocalDate endDate);
+    Depense findByUtilisateurAndDateDepense(Utilisateur utilisateur, LocalDate localDate);
 
     Depense findByCategorieDepense(CategorieDepense categorieDepense);
     List<Depense> getAllDepenseByDemande_IdDemande(long idDemande);

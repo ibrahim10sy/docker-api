@@ -32,4 +32,12 @@ public class Admin {
     @Column(length = 255, nullable = false)
     private  String motDePasse;
 
+    @OneToMany
+    @JsonIgnore
+    private List<Budget> budgetList;
+
+    @OneToMany
+    @JsonIgnore
+    private List<Demande> demandeList;
+
 }
