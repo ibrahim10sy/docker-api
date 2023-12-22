@@ -32,12 +32,19 @@ public class Admin {
     @Column(length = 255, nullable = false)
     private  String motDePasse;
 
-    @OneToMany
+    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Budget> budgetList;
 
-    @OneToMany
+    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Demande> demandeList;
 
+    @OneToMany(mappedBy = "admin",cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<CategorieDepense> categorieList;
+
+    @OneToMany(mappedBy = "admin",cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Depense> depenseList;
 }

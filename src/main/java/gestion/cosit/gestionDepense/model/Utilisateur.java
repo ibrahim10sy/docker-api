@@ -35,16 +35,24 @@ public class Utilisateur {
     @Column(length = 255, nullable = false)
     private  String motDePasse;
 
-    @OneToMany(mappedBy = "utilisateur")
+    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Budget> budgetList;
+
+    @OneToMany(mappedBy = "utilisateur",cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Salaire> salaireList;
 
-    @OneToMany(mappedBy = "utilisateur")
+    @OneToMany(mappedBy = "utilisateur",cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Demande> demandeList;
 
-    @OneToMany(mappedBy = "utilisateur")
+    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<CategorieDepense> categorieList;
+
+    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Depense> depenseList;
 }
 

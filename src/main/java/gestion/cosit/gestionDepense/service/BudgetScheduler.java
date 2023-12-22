@@ -11,9 +11,9 @@ public class BudgetScheduler {
     private  BudgetService budgetService;
 
     @Scheduled(cron = "0 0 0  1 * ?") // Exécuté à minuit chaque premier jour du mois
-    public void  allocateBudgetMonthly(){
+    public void  allocateBudgetMonthly(long idBudget){
 
         System.out.println("test budgetScheduler ");
-        budgetService.allocateBudgetMonthly();
+        budgetService.allocateBudgetMonthlyById(idBudget);
     }
 }

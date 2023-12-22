@@ -26,8 +26,17 @@ public class CategorieService {
     @Autowired
     private SousCategorieRepository sousCategorieRepository;
 
-    public CategorieDepense saveCategorie(CategorieDepense categorieDepense)  {
+    public CategorieDepense saveCategorieByUser(CategorieDepense categorieDepense)  {
         CategorieDepense categorieVerif = categorieRepository.findByUtilisateurAndLibelle(categorieDepense.getUtilisateur(), categorieDepense.getLibelle());
+        if (categorieVerif != null) {
+            throw new DuplicateRequestException("Une catégorie avec le libellé '" + categorieDepense.getLibelle() +
+                    "' existe déjà pour ce personnel.");
+        }
+        return categorieRepository.save(categorieDepense);
+    }
+
+    public CategorieDepense saveCategorieAdmin(CategorieDepense categorieDepense)  {
+        CategorieDepense categorieVerif = categorieRepository.findByAdminAndLibelle(categorieDepense.getAdmin(), categorieDepense.getLibelle());
         if (categorieVerif != null) {
             throw new DuplicateRequestException("Une catégorie avec le libellé '" + categorieDepense.getLibelle() +
                     "' existe déjà pour ce personnel.");
@@ -64,6 +73,16 @@ public class CategorieService {
 
         return categoriesListe;
     }
+
+    public List<CategorieDepense> getAllCategorieDepenseByAdmin(long idAdmin){
+        List<CategorieDepense>  categoriesListe = categorieRepository.findByAdminIdAdmin(idAdmin);
+
+        if(categoriesListe.isEmpty()){
+            throw new EntityNotFoundException("Aucun categorie trouvé");
+        }
+
+        return categoriesListe;
+    }
     public List<CategorieDepense> lire(){
         return categorieRepository.findAll();
     }
@@ -77,7 +96,7 @@ public class CategorieService {
             throw new NoContentException("On peut pas supprimer une categorie qui est déjà associer à une depense");
 
         categorieRepository.delete(categorieDepense);
-        return "Utilisateur supprimé avec succèss";
+        return "Catégorie supprimé avec succèss";
     }
 //    public String supprimer(long idCategoriedepense){
 //        CategorieDepense categorieDepense = categorieRepository.findByIdCategoriedepense(idCategoriedepense);

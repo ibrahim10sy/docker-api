@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -20,11 +21,9 @@ public class Demande {
     private String motif;
 
     @Column(nullable = false)
-    private double montantDemande;
+    private int montantDemande;
 
-
-    @JsonFormat(pattern="yyyy-MM-dd")
-    private Date dateDemande;
+    private LocalDate dateDemande;
 
     @Column(nullable = true)
     private boolean autorisationDirecteur;

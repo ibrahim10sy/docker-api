@@ -1,6 +1,7 @@
 package gestion.cosit.gestionDepense.repository;
 
 import gestion.cosit.gestionDepense.model.Budget;
+import gestion.cosit.gestionDepense.model.CategorieDepense;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,11 +18,12 @@ public interface BudgetRepository extends JpaRepository<Budget,Long> {
 //    Budget findByDateFin(LocalDate localDate);
     Budget findByDateFin(LocalDate dateFin);
     List<Budget> findByDescriptionContaining( String desc);
-
+    List<Budget> findByUtilisateurIdUtilisateur(long idUtilisateur);
+//    List<Budget> findByAdminIdAdmin(long idAdmin);
     @Query(value = "SELECT * FROM Budget WHERE  date_debut LIKE :date ",nativeQuery = true)
     List<Budget> getBudgetByMonthAndYear(@Param("date") String date);
 
     @Query(value = "SELECT sum(montant), sum(montant_restant) FROM Budget", nativeQuery = true)
-    Double[][] getSommeOfTotalBudgetNotFinish();
+    Integer[][] getSommeOfTotalBudgetNotFinish();
 
 }

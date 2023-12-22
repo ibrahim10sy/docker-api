@@ -20,10 +20,10 @@ public class Budget {
     private String description;
 
     @Column(nullable = false)
-    private double montant;
+    private int montant;
 
     @Column(nullable = false)
-    private double montantRestant;
+    private int montantRestant;
 
     @NotNull(message = "Désole la date ne doit pas etre null")
     @Column(nullable = false)
@@ -37,7 +37,10 @@ public class Budget {
     @ManyToOne
     private Admin admin;
 
-    @OneToMany
+    @NotNull
+    @ManyToOne
+    private Utilisateur utilisateur;
+    @OneToMany(mappedBy = "budget",cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Depense> depenseList;
 

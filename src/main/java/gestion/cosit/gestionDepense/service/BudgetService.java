@@ -1,10 +1,10 @@
 package gestion.cosit.gestionDepense.service;
 
 import gestion.cosit.gestionDepense.Exception.NoContentException;
-import gestion.cosit.gestionDepense.model.Admin;
-import gestion.cosit.gestionDepense.model.Budget;
+import gestion.cosit.gestionDepense.model.*;
 import gestion.cosit.gestionDepense.repository.AdminRepository;
 import gestion.cosit.gestionDepense.repository.BudgetRepository;
+import gestion.cosit.gestionDepense.repository.UtilisateurRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BudgetService {
@@ -23,13 +24,18 @@ public class BudgetService {
      private BudgetRepository budgetRepository;
     @Autowired
     private AdminRepository adminRepository;
+    @Autowired
+    private UtilisateurRepository utilisateurRepository;
 
 
     @Transactional
     public Budget createBudget(Budget budget) {
         Admin admin = adminRepository.findByIdAdmin(budget.getAdmin().getIdAdmin());
          if(admin == null)
-           throw new NoContentException("Ce admin n'existe pas");
+           throw new EntityNotFoundException("Ce admin n'existe pas");
+//        Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(budget.getUtilisateur().getIdUtilisateur());
+
+
         LocalDate toDay = LocalDate.now(); // Obtention de la date du jour en type LocalDate
         LocalDate dateDebut = budget.getDateDebut();
         LocalDate jourMaxDuMois = dateDebut.with(TemporalAdjusters.lastDayOfMonth()); // Obtention du dernier date du mois actuel
@@ -39,52 +45,62 @@ public class BudgetService {
     }
 
     @Transactional
-    public void allocateBudgetMonthly(){
-        LocalDate now = LocalDate.now();
-        Budget budget = budgetRepository.findByDateFin(now.withDayOfMonth(now.lengthOfMonth()));
-        if(budget != null){
-            System.out.println("test allocation :"+budget);
-            LocalDate dateDebut = budget.getDateDebut();
-            LocalDate jourMaxDuMois = dateDebut.with(TemporalAdjusters.lastDayOfMonth()); // Obtention du dernier date du mois actuel
-            budget.setDateFin(jourMaxDuMois);
-            budget.setMontantRestant(budget.getMontant());
-            System.out.println("fin du test allocation ");
+    public void allocateBudgetMonthlyById(long budgetId) {
+        // Load the specific budget by ID
+        Optional<Budget> optionalBudget = budgetRepository.findById(budgetId);
 
-            budgetRepository.save(budget);
+        if (optionalBudget.isPresent()) {
+            Budget existingBudget = optionalBudget.get();
+            System.out.println("Allocation monthly test for budget with ID " + budgetId + ": " + existingBudget);
+
+            // Clone existing budget
+            Budget newBudget = new Budget();
+            newBudget.setDescription(existingBudget.getDescription());
+            newBudget.setMontant(existingBudget.getMontant());
+            newBudget.setDateDebut(existingBudget.getDateDebut());
+            newBudget.setDateFin(existingBudget.getDateFin());
+            newBudget.setAdmin(existingBudget.getAdmin());
+            newBudget.setMontantRestant(existingBudget.getMontant());
+
+            // Save the new budget
+            budgetRepository.save(newBudget);
+
+            System.out.println("Allocation monthly completed for budget with ID " + budgetId + ": " + newBudget);
         }
     }
-//    public Budget createBudget(Budget budget) throws BadRequestException {
-//        Admin admin = adminRepository.findByIdAdmin(budget.getAdmin().getIdAdmin());
+
+//    public Budget updateBudget(Budget budget, long id) {
+//        // Récupérer le budget existant par son ID
+//        Budget existingBudget = budgetRepository.findById(id)
+//                .orElseThrow(() -> new EntityNotFoundException("Ce budget n'existe pas avec l'ID spécifique " + id));
 //
-//        if(admin == null)
-//            throw new NoContentException("Ce admin n'existe pas");
+//        // Mettre à jour les champs du budget existant avec les valeurs du nouveau budget
+//        existingBudget.setDescription(budget.getDescription());
+//        existingBudget.setMontant(budget.getMontant());
+//        existingBudget.setDateDebut(budget.getDateDebut());
 //
-//        LocalDate toDay = LocalDate.now(); // Obtention de la date du jour en type LocalDate
-//        LocalDate dateDebut = budget.getDateDebut();
-//        LocalDate jourMaxDuMois = dateDebut.with(TemporalAdjusters.lastDayOfMonth()); // Obtention du dernier date du mois actuel
-//        budget.setDateFin(jourMaxDuMois);
-//        budget.setMontantRestant(budget.getMontant());
+//        // Calculer la date de fin en utilisant le dernier jour du mois de la date de début
+//        LocalDate dateDebut = existingBudget.getDateDebut();
+//        LocalDate jourMaxDuMois = dateDebut.with(TemporalAdjusters.lastDayOfMonth());
+//        existingBudget.setDateFin(jourMaxDuMois);
 //
-//        if (dateDebut.getMonthValue() < toDay.getMonthValue() || (dateDebut.getYear() != toDay.getYear()))
-//            throw new BadRequestException("Veuillez choisie une date dans "+toDay.getMonth()+" "+toDay.getYear());
+//        // Mettre à jour le montant restant avec le montant du nouveau budget
+//        existingBudget.setMontantRestant(budget.getMontant());
 //
-//        Budget verifBudget = budgetRepository.findByDateFin(budget.getDateFin());
-//        if (verifBudget != null )
-//            throw new BadRequestException("Vous avez déjà un budget pour ce mois");
-//
-//        System.out.println("Budget service "+budget);
-//        return budgetRepository.save(budget); // On sauvegarde ce budget dans notre base de donnée
+//        // Sauvegarder les modifications dans la base de données en utilisant le repository
+//        return budgetRepository.save(existingBudget);
 //    }
-
     public Budget updateBudget(Budget budget, long id){
-        Budget budget1 = budgetRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Ce budget nexiste pas l' ID spécifique "+id));
+        Budget existingBudget = budgetRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Ce budget n'existe pas avec l'ID spécifique " + id));
+        existingBudget.setDescription(budget.getDescription());
+        existingBudget.setMontant(budget.getMontant());
+        existingBudget.setDateDebut(budget.getDateDebut());
+        LocalDate date = budget.getDateDebut();
+        LocalDate jourMaxDuMois = date.with(TemporalAdjusters.lastDayOfMonth());
+        existingBudget.setDateFin(jourMaxDuMois);
 
-        budget1.setDescription(budget.getDescription());
-        budget1.setMontant(budget.getMontant());
-        budget1.setDateDebut(budget.getDateDebut());
-        budget1.setDateFin(budget.getDateDebut());
-
-        return budgetRepository.save(budget);
+        return budgetRepository.save(existingBudget);
     }
 
     public List<Budget> allBudget(){
@@ -97,7 +113,36 @@ public class BudgetService {
         // Dans le cas contraire le systÃ¨me retourne la liste
         return budgetList;
     }
+    public List<Budget> getAllBudgetByUser(long idUtilisateur){
+        List<Budget>  budgetListe = budgetRepository.findByUtilisateurIdUtilisateur(idUtilisateur);
 
+        if(budgetListe.isEmpty()){
+            throw new EntityNotFoundException("Aucun budget trouvé pour ce utilisateur");
+        }
+
+        return budgetListe;
+    }
+    public List<Budget> allBudgetByUser(long idUtilisateur){
+        List<Budget> budgetList = budgetRepository.findByUtilisateurIdUtilisateur(idUtilisateur);
+
+        // Si la liste est vide, le systÃ¨me lÃ¨vera une exception
+        if (budgetList.isEmpty())
+            throw new NoContentException("Aucun budget trouvÃ©");
+
+        // Dans le cas contraire le systÃ¨me retourne la liste
+        return budgetList;
+    }
+
+//    public List<Budget> allBudgetByAdmin(long idAdmin){
+//        List<Budget> budgetList = budgetRepository.findByAdminIdAdmin(idAdmin);
+//
+//        // Si la liste est vide, le systÃ¨me lÃ¨vera une exception
+//        if (budgetList.isEmpty())
+//            throw new NoContentException("Aucun budget trouvÃ©");
+//
+//        // Dans le cas contraire le systÃ¨me retourne la liste
+//        return budgetList;
+//    }
     public List<Budget> searchBudget(String desc){
 
         // Obtention de tous les budget dans la base de donnÃ©es
@@ -126,7 +171,7 @@ public class BudgetService {
 
     public HashMap<String,Object> sommeOfAllBudgetNotFinish(){
         HashMap<String , Object> hashMap = new HashMap<>();
-        Double[][] result = budgetRepository.getSommeOfTotalBudgetNotFinish();
+        Integer[][] result = budgetRepository.getSommeOfTotalBudgetNotFinish();
         if(result[0][0] == null || result[0][1] == null){
             hashMap.put("Total",0);
             hashMap.put("Restant",0);

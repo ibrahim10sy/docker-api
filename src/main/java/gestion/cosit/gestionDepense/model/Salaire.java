@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -19,14 +20,13 @@ public class Salaire {
     private String description;
 
     @Column(nullable = false)
-    private double montant;
+    private int montant;
 
-    @NotNull(message = "Désolé, la date ne doit pas être null")
+    @Temporal(TemporalType.DATE)
     @Column(nullable = false)
-    @JsonFormat(pattern="yyyy-MM-dd")
-    private Date date;
+    private LocalDate date;
 
-    @ManyToOne
+    @ManyToOne()
     private Utilisateur utilisateur;
 
 }

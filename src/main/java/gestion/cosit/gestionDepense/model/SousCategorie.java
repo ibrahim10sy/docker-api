@@ -18,6 +18,4 @@ public class SousCategorie {
     @ManyToOne
     private CategorieDepense categorieDepense;
 
-    @ManyToOne
-    private Utilisateur utilisateur;
 }

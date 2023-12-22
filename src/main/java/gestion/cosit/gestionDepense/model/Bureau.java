@@ -21,7 +21,7 @@ public class Bureau {
     private String adresse;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "bureau")
+    @OneToMany(mappedBy = "bureau",cascade = CascadeType.ALL)
     private List<Depense> depenseList;
 
 }

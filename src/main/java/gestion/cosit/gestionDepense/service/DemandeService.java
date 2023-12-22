@@ -11,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -27,6 +28,8 @@ public class DemandeService {
         Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(demande.getUtilisateur().getIdUtilisateur());
         if(utilisateur == null)
             throw new NoContentException("utilisateur non trouvé");
+        LocalDate toDay = LocalDate.now();
+        demande.setDateDemande(toDay);
         return demandeRepositroy.save(demande);
     }
 

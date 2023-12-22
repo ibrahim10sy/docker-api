@@ -26,7 +26,7 @@ public class Depense {
     private String description;
 
     @Column(length = 255, nullable = false)
-    private double montantDepense;
+    private int montantDepense;
 
 
     @NotNull(message = "Désolé, la date ne doit pas être null")
@@ -39,6 +39,9 @@ public class Depense {
     @JoinColumn(name = "utilisateur_id")
     private Utilisateur utilisateur;
 
+    @ManyToOne
+    @JoinColumn(name = "admin_id")
+    private Admin admin;
 
     @OneToOne(mappedBy = "depense", cascade = CascadeType.ALL, orphanRemoval = true)
     private Demande demande;

@@ -23,10 +23,16 @@ public class DepenseController {
     @Autowired
     private DepenseService depenseService;
 
-        @PostMapping("/create")
+        @PostMapping("/createByUser")
     @Operation(summary = "création de dépense")
     public ResponseEntity<Depense> createDepense(@Valid @RequestBody Depense depense) throws BadRequestException {
-        return new ResponseEntity<>(depenseService.saveDepense(depense), HttpStatus.CREATED);
+        return new ResponseEntity<>(depenseService.saveDepenseByUser(depense), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/createByAdmin")
+    @Operation(summary = "création de dépense")
+    public ResponseEntity<Depense> createDepenseByAdmin(@Valid @RequestBody Depense depense) throws BadRequestException {
+        return new ResponseEntity<>(depenseService.saveDepenseByAdmin(depense), HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
@@ -69,18 +75,27 @@ public class DepenseController {
 //        return new ResponseEntity<>(updateDepenses, HttpStatus.CREATED);
 //    }
 
-    @GetMapping("/listDemandeByUser/{id}")
-    @Operation(summary = "Affichage  des dépenses par en fonction des  demande")
-    public ResponseEntity<List<Depense>> getAllDepenseByDemande(@PathVariable long id){
-        return  new ResponseEntity<>(depenseService.allDepenseByIdDemande(id), HttpStatus.OK);
+    @GetMapping("/{idBudget}")
+    @Operation(summary = "Affichage des dépenses")
+    public List<Depense> readByBudget(@PathVariable long idBudget){
+        return depenseService.getDepenseByIdBudget(idBudget);
+    }
+    @GetMapping("/listDemandeByUser/{idDemande}")
+    @Operation(summary = "Affichage  des dépenses  en fonction du  demande")
+    public ResponseEntity<List<Depense>> getAllDepenseByDemande(@PathVariable long idDemande){
+        return  new ResponseEntity<>(depenseService.allDepenseByIdDemande(idDemande), HttpStatus.OK);
     }
 
-    @GetMapping("/listDepenseByUser/{id}")
+    @GetMapping("/listDepenseByUser/{idUtilisateur}")
+    @Operation(summary = "Affichage  des dépenses  en fonction de user")
+    public ResponseEntity<List<Depense>> getAllDepenseByUser(@PathVariable long idUitlisateur){
+        return  new ResponseEntity<>(depenseService.allDepenseByIdUtilisateur(idUitlisateur), HttpStatus.OK);
+    }
+    @GetMapping("/listDepenseByAdmin/{idAdmin}")
     @Operation(summary = "Affichage  des dépenses par en fonction de user")
-    public ResponseEntity<List<Depense>> getAllDepenseByUser(@PathVariable long id){
-        return  new ResponseEntity<>(depenseService.allDepenseByIdUtilisateur(id), HttpStatus.OK);
+    public ResponseEntity<List<Depense>> getAllDepenseByAdmin(@PathVariable long idAdmin){
+        return  new ResponseEntity<>(depenseService.allDepenseByIdAdmin(idAdmin), HttpStatus.OK);
     }
-
     @GetMapping("/read")
     @Operation(summary = "Affichage  des dépenses par en fonction des  demande")
     public ResponseEntity<List<Depense>> getAllDepenseByDemande(){

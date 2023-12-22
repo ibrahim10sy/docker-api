@@ -19,14 +19,17 @@ public class CategorieDepense {
     private String libelle;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "categorieDepense")
+    @OneToMany(mappedBy = "categorieDepense",cascade = CascadeType.ALL)
     private List<Depense> depenseList;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "categorieDepense")
+    @OneToMany(mappedBy = "categorieDepense",cascade = CascadeType.ALL)
     private List<SousCategorie> sousCategorieList;
 
     @ManyToOne
     private Utilisateur utilisateur;
+
+    @ManyToOne
+    private Admin admin;
 
 }

@@ -29,6 +29,8 @@ public class SousCategorieService {
             throw new NoContentException("Catégorie non trouvé");
 
         SousCategorie sousCategorie1 = sousCategorieRepository.findByIdSousCategorie(sousCategorie.getIdSousCategorie());
+        if(sousCategorie1 != null)
+            throw new NoContentException("Ce sous categorie existe déjà");
         return sousCategorieRepository.save(sousCategorie);
     }
 

@@ -31,6 +31,7 @@ public class BureauController {
         return new ResponseEntity<>(bureauService.getAllBureau(), HttpStatus.OK);
     }
 
+
     @PutMapping("/update/{id}")
     @Operation(summary = "Modification des bureaux")
     public ResponseEntity<Bureau> updateBureau(@RequestBody Bureau bureau, @PathVariable long id){

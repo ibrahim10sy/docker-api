@@ -2,6 +2,7 @@ package gestion.cosit.gestionDepense.service;
 
 import gestion.cosit.gestionDepense.Exception.NoContentException;
 import gestion.cosit.gestionDepense.model.Admin;
+import gestion.cosit.gestionDepense.model.Utilisateur;
 import gestion.cosit.gestionDepense.repository.AdminRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -138,5 +139,14 @@ public class AdminService {
         }else{
             throw  new NotFoundException("Ce compte n'existe pas");
         }
+    }
+
+    public Admin connection(String email, String motDePasse){
+         Admin admin= adminRepository.findByEmailAndMotDePasse(email, motDePasse);
+        if (admin == null) {
+            throw new EntityNotFoundException("Ce utilisateur n'existe pas");
+        }
+
+        return admin;
     }
 }

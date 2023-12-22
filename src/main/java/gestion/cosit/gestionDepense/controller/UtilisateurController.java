@@ -2,6 +2,7 @@ package gestion.cosit.gestionDepense.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import gestion.cosit.gestionDepense.Exception.NoContentException;
 import gestion.cosit.gestionDepense.model.Utilisateur;
 import gestion.cosit.gestionDepense.service.UtilisateurService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,11 +58,26 @@ public class UtilisateurController {
         return new ResponseEntity<>(updateUser, HttpStatus.OK);
     }
 
+//    @GetMapping("/read")
+//    @Operation(summary = "Affichages utilisateurs")
+//    public  ResponseEntity<List<Utilisateur>> getUtilisateur(){
+//        return  new ResponseEntity<>(utilisateurService.getAllUtisateur(), HttpStatus.OK);
+//    }
     @GetMapping("/read")
     @Operation(summary = "Affichages utilisateurs")
-    public  ResponseEntity<List<Utilisateur>> getUtilisateur(){
-        return  new ResponseEntity<>(utilisateurService.getAllUtisateur(), HttpStatus.OK);
+    public ResponseEntity<List<Utilisateur>> getUtilisateurs() {
+        try {
+            List<Utilisateur> utilisateurs = utilisateurService.getAllUtisateur();
+            return ResponseEntity.ok(utilisateurs);
+        } catch (NoContentException e) {
+            // Gérer l'exception NoContentException
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            // Gérer d'autres exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
+
     @GetMapping("/read/{id}")
     @Operation(summary = "Affichage d'un utilisateurs")
     public ResponseEntity<Utilisateur> getUtilisateurById(@Valid @PathVariable long id){

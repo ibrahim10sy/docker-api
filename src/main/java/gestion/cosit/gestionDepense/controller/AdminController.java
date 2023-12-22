@@ -67,11 +67,10 @@ public class AdminController {
       public Object connexion(@RequestParam("email") String email, @RequestParam("motDePasse") String motDePasse) throws AuthenticationException {
           return adminService.connexion(email,motDePasse);
       }*/
-    @PostMapping("/connexion")
-    @Operation(summary = "Connexion d'un utilisateur")
-    public Object connexion(@RequestBody Map<String, String> requestBody) {
-        String email = requestBody.get("email");
-        String motDePasse = requestBody.get("motDePasse");
-        return adminService.connexion(email, motDePasse);
+    @PostMapping("/login")
+    @Operation(summary = "Connexion de l'admin")
+    public Object connexion(@RequestParam("email") String email,
+                            @RequestParam("motDePasse") String motDePasse) {
+        return adminService.connection(email, motDePasse);
     }
 }

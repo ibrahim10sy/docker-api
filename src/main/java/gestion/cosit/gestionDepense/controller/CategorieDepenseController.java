@@ -23,12 +23,17 @@ public class CategorieDepenseController {
     @Autowired
     private CategorieService categorieService;
 
-    @PostMapping("/create")
+    @PostMapping("/createByUser")
     @Operation(summary = "Création de catégorie")
-    public ResponseEntity<CategorieDepense> createCategorie(@RequestBody CategorieDepense categorieDepense){
-        return new ResponseEntity<>(categorieService.saveCategorie(categorieDepense), HttpStatus.CREATED);
+    public ResponseEntity<CategorieDepense> createCategorieByUser(@RequestBody CategorieDepense categorieDepense){
+        return new ResponseEntity<>(categorieService.saveCategorieByUser(categorieDepense), HttpStatus.CREATED);
     }
 
+    @PostMapping("/createByAdmin")
+    @Operation(summary = "Création de catégorie")
+    public ResponseEntity<CategorieDepense> createCategorieByAdmin(@RequestBody CategorieDepense categorieDepense){
+        return new ResponseEntity<>(categorieService.saveCategorieAdmin(categorieDepense), HttpStatus.CREATED);
+    }
     @GetMapping("/lire")
     @Operation(summary = "affichage des categories")
     public List<CategorieDepense> lire(){
@@ -39,6 +44,11 @@ public class CategorieDepenseController {
     @Operation(summary = "affichage des categories à travers l'id utilisateur")
     public ResponseEntity<List<CategorieDepense>> listeCategorieByUser(@PathVariable long idUtilisateur){
         return  new ResponseEntity<>(categorieService.getAllCategorieDepenseByUser(idUtilisateur), HttpStatus.OK);
+    }
+    @GetMapping("/listeByAdmin/{idAdmin}")
+    @Operation(summary = "affichage des categories à travers l'id de l'admin")
+    public ResponseEntity<List<CategorieDepense>> listeCategorieByAdmin(@PathVariable long idAdmin){
+        return  new ResponseEntity<>(categorieService.getAllCategorieDepenseByAdmin(idAdmin), HttpStatus.OK);
     }
 
     @GetMapping("/list/{idCategorieDepense}")

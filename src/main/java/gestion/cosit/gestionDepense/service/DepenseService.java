@@ -29,8 +29,10 @@ public class DepenseService {
         DemandeRepository demandeRepositroy;
         @Autowired
         BudgetRepository budgetRepository;
+        @Autowired
+        AdminRepository adminRepository;
 
-    public Depense saveDepense(Depense depense) throws BadRequestException {
+    public Depense saveDepenseByUser(Depense depense) throws BadRequestException {
 
         Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(depense.getUtilisateur().getIdUtilisateur());
         CategorieDepense categorieDepense = categorieRepository.findByIdCategoriedepense(depense.getCategorieDepense().getIdCategoriedepense());
@@ -45,10 +47,9 @@ public class DepenseService {
         if (utilisateur == null)
             throw new BadRequestException("User invalid");
 
-        if (depense.getMontantDepense() > budget.getMontantRestant()) {
+        Demande demande = demandeRepositroy.findByIdDemande(depense.getDemande().getIdDemande());
+        if (depense.getMontantDepense() > budget.getMontantRestant() ) {
             System.out.println("Condition vérifier");
-            Demande demande = demandeRepositroy.findByIdDemande(depense.getDemande().getIdDemande());
-
             if (demande == null) {
                 throw new BadRequestException("La demande associée à la dépense n'existe pas");
             }
@@ -58,11 +59,6 @@ public class DepenseService {
 //            if (depense.getMontantDepense() > demande.getMontantDemande()) {
 //                throw new BadRequestException("Le montant de la dépense ne doit pas être supérieur à celui du montant demandé " + demande.getMontantDemande());
 //            }
-
-            depense.setDemande(demande);
-        } else if (budget.getMontantRestant() == 0) {
-        throw new BadRequestException("Le montant du budget ateint" +budget.getMontantRestant() );
-
         }
 
         // Mettre à jour le montant restant du budget
@@ -73,7 +69,35 @@ public class DepenseService {
         // Enregistrer la dépense mise à jour
         return depenseRepository.save(depense);
     }
+    public Depense saveDepenseByAdmin(Depense depense) throws BadRequestException {
+        Admin admin = adminRepository.findByIdAdmin(depense.getAdmin().getIdAdmin());
+        CategorieDepense categorieDepense = categorieRepository.findByIdCategoriedepense(depense.getCategorieDepense().getIdCategoriedepense());
+        Budget budget = budgetRepository.findByIdBudget(depense.getBudget().getIdBudget());
 
+        if(budget == null)
+            throw new BadRequestException("Desolé ce budget n'existe pas");
+
+        if(categorieDepense == null)
+            throw new BadRequestException("Desolé cette catégorie n'existe pas");
+
+        if (admin == null)
+            throw new BadRequestException("Admin invalid");
+
+            if (depense.getMontantDepense() > budget.getMontantRestant()) {
+                throw new BadRequestException("Le montant de la dépense ne doit pas être supérieur à celui du montant restant du budget " );
+            } else if (budget.getMontantRestant() == 0) {
+                throw new BadRequestException("Le  montant restant du budget est atteint" );
+
+            }
+
+        // Mettre à jour le montant restant du budget
+        budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
+        System.out.println(depense);
+        budgetRepository.save(budget);
+
+        // Enregistrer la dépense mise à jour
+        return depenseRepository.save(depense);
+    }
     public Depense updateDepense(Depense depense, long id){
         Depense isDepenseExist = depenseRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Depense non trouvé"));
 
@@ -216,8 +240,22 @@ public class DepenseService {
             throw new EntityNotFoundException("Aucun depense trouvé en fonction de la demande");
         return depenseList;
     }
+    public List<Depense> allDepenseByIdAdmin(long idAdmin){
+        List<Depense> depenseList = depenseRepository.findByAdminIdAdmin(idAdmin);
+
+        if(depenseList.isEmpty())
+            throw new EntityNotFoundException("Aucun depense trouvé en fonction de la demande");
+        return depenseList;
+    }
+    public List<Depense> getDepenseByIdBudget(long idBudget){
+        List<Depense> depensesList = depenseRepository.findByBudgetIdBudget(idBudget);
+        if (depensesList.isEmpty())
+            throw new EntityNotFoundException("Aucune depenses trouvée");
+        return depensesList;
+
+    }
     public List<Depense> allDepenseByIdDemande(long idDemande){
-        List<Depense> depenseList = depenseRepository.getAllDepenseByDemande_IdDemande(idDemande);
+        List<Depense> depenseList = depenseRepository.findAllDepenseByDemande_IdDemande(idDemande);
 
         if(depenseList.isEmpty())
             throw new EntityNotFoundException("Aucun depense trouvé en fonction de la demande");

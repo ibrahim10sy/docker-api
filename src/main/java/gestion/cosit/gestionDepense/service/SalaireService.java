@@ -9,7 +9,9 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +30,8 @@ public class SalaireService {
         }
 
         // Assurez-vous que la date est définie dans votre objet salaire
-        Date dateSalaire = salaire.getDate();
-
+//        Date dateSalaire = salaire.getDate();
+        LocalDate dateSalaire = salaire.getDate();
         // Vérifiez si le salaire pour cette date existe déjà
         Optional<Salaire> existingSalaire = salaireRepository.findByUtilisateurAndDate(utilisateur, dateSalaire);
 
@@ -49,6 +51,17 @@ public class SalaireService {
         return salaireRepository.save(salaires);
     }
 
+    public HashMap<String,Object> sommeOfAllSalaireNotFinish(){
+        HashMap<String , Object> hashMap = new HashMap<>();
+        Integer[] result = salaireRepository.getSommeOfTotalSalaireNotFinish();
+        if(result[0] == null || result[0] == null){
+            hashMap.put("Total",0);
+        }
+        else{
+            hashMap.put("Total",result[0]);
+        }
+        return hashMap;
+    }
     public List<Salaire> getAllSalaire(){
         List<Salaire> salaireList = salaireRepository.findAll();
         if(salaireList.isEmpty())
@@ -63,6 +76,13 @@ public class SalaireService {
         return salaireList;
     }
 
+    public String supprimerSalaire(long idSalaire){
+        Salaire salaire = salaireRepository.findByIdSalaire(idSalaire);
+        if(salaire == null )
+            throw new NoContentException("Aucun salaire trouvé avec id"+idSalaire);
+        salaireRepository.delete(salaire);
+        return "Salaire supprimer avec succèss";
+    }
     public String deleteSalaire(long id){
         Salaire salaire = salaireRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Aucun donné trouvé"));
         salaireRepository.delete(salaire);

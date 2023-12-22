@@ -1,6 +1,8 @@
 package gestion.cosit.gestionDepense.controller;
 
 import gestion.cosit.gestionDepense.model.Budget;
+import gestion.cosit.gestionDepense.model.Bureau;
+import gestion.cosit.gestionDepense.model.CategorieDepense;
 import gestion.cosit.gestionDepense.repository.BudgetRepository;
 import gestion.cosit.gestionDepense.service.BudgetService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,9 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/Budget")
 public class BudgetController {
 
@@ -36,17 +40,16 @@ public class BudgetController {
     Budget createdBudget = budgetService.createBudget(budget);
     return new ResponseEntity<>(createdBudget, HttpStatus.OK);
 }
-    @PostMapping("/allouer-mensuellement")
-    public ResponseEntity<String> allocateBudgetMonthlyManually() {
+    @PostMapping("/allouer-mensuellement/{budgetId}")
+    public ResponseEntity<String> allocateBudgetMonthlyManually(@PathVariable long budgetId) {
         try {
-            budgetService.allocateBudgetMonthly();
+            budgetService.allocateBudgetMonthlyById(budgetId);
             return new ResponseEntity<>("Allocation mensuelle effectuée avec succès.", HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace(); // Enregistrez l'exception
             return new ResponseEntity<>("Erreur lors de l'allocation mensuelle.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     @PutMapping("/modifier/{id}")
     @Operation(summary = "Modification d'un  d'un budget")
@@ -60,6 +63,22 @@ public class BudgetController {
         return  new ResponseEntity<>(budgetService.allBudget(),HttpStatus.OK);
     }
 
+    @GetMapping("/listeByUser/{idUtilisateur}")
+    @Operation(summary = "affichage des categories à travers l'id utilisateur")
+    public ResponseEntity<List<Budget>> listeBudgetByUser(@PathVariable long idUtilisateur){
+        return  new ResponseEntity<>(budgetService.getAllBudgetByUser(idUtilisateur), HttpStatus.OK);
+    }
+
+//    @GetMapping("/readByIdAdmin/{idAdmin}")
+//    @Operation(summary = "Affichage la liste  des budgets par id user")
+//    public ResponseEntity<List<Budget>> listeBudgetByAdmin(long idAdmin){
+//        return  new ResponseEntity<>(budgetService.allBudgetByAdmin(idAdmin),HttpStatus.OK);
+//    }
+//    @GetMapping("")
+//    @Operation(summary = "Liste des bureaux")
+//    public ResponseEntity<List<Bureau>> listeBureau(){
+//        return new ResponseEntity<>(bure auService.getAllBureau(), HttpStatus.OK);
+//    }
     @GetMapping("/search")
     @Operation(summary = "Rechercher un budget par sa description")
     public ResponseEntity<List<Budget>> searchBudgetByDesc( @RequestParam("desc") String desc){
@@ -71,7 +90,11 @@ public class BudgetController {
     public ResponseEntity<List<Budget>> sortByMonthAndYear(@RequestParam("date") String date){
         return  new ResponseEntity<>(budgetService.sortBudgetByMonthAndYear(date),HttpStatus.OK);
     }
-
+    @GetMapping("/somme")
+    @Operation(summary = "Retourne la somme total de l'ensemble des budget")
+    public ResponseEntity<HashMap<String,Object>> sommeTotal(){
+        return  new ResponseEntity<>(budgetService.sommeOfAllBudgetNotFinish(),HttpStatus.OK);
+    }
     @DeleteMapping("/supprimer/{idBudget}")
     @Operation(summary = "suppression d'un  budget")
     public ResponseEntity<String> supprimerBudget(@PathVariable long idBudget) throws BadRequestException {

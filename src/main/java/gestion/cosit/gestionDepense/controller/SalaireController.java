@@ -12,9 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/Salaire")
 public class SalaireController {
 
@@ -38,25 +40,34 @@ public class SalaireController {
     public ResponseEntity<List<Salaire>> getAll(){
         return new ResponseEntity<>(salaireService.getAllSalaire(),HttpStatus.OK);
     }
-
+    @GetMapping("/somme")
+    @Operation(summary = "Retourne la somme total de l'ensemble des budget")
+    public ResponseEntity<HashMap<String,Object>> sommeTotal(){
+        return  new ResponseEntity<>(salaireService.sommeOfAllSalaireNotFinish(),HttpStatus.OK);
+    }
     @GetMapping("/liste/{id}")
     @Operation(summary = "Liste des salaires")
     public ResponseEntity<List<Salaire>> getAllUser(@PathVariable long id){
         return new ResponseEntity<>(salaireService.getAllSalaireByUser(id),HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
-    @Operation(summary = "Suppression d'un salaire")
-    public String supprimerSalaire(@PathVariable long idSalaire) {
-        try {
-            return salaireService.deleteSalaire(idSalaire);
-        } catch (EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Salaire non trouvée avec l'ID spécifié", e);
-        } catch (NoContentException e) {
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT, e.getMessage(), e);
-        } catch (Exception e) {
-            // Gérer d'autres exceptions non prévues ici
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Une erreur interne s'est produite", e);
-        }
+    @DeleteMapping("/delete/{idSalaire}")
+    @Operation(summary = "Supprimer un salaire")
+    public String supprimer(@PathVariable long idSalaire){
+        return salaireService.deleteSalaire(idSalaire);
     }
+//    @DeleteMapping("/delete/{id}")
+//    @Operation(summary = "Suppression d'un salaire")
+//    public String supprimerSalaire(@PathVariable long idSalaire) {
+//        try {
+//            return salaireService.deleteSalaire(idSalaire);
+//        } catch (EntityNotFoundException e) {
+//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Salaire non trouvée avec l'ID spécifié", e);
+//        } catch (NoContentException e) {
+//            throw new ResponseStatusException(HttpStatus.NO_CONTENT, e.getMessage(), e);
+//        } catch (Exception e) {
+//            // Gérer d'autres exceptions non prévues ici
+//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Une erreur interne s'est produite", e);
+//        }
+//    }
 }
