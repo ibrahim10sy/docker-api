@@ -53,15 +53,15 @@ public class CategorieService {
     }
 
     ///list des sous_catégorie
-    public List<SousCategorie> listSousCategorie(long idCategorieDepense) {
-        List<SousCategorie> sousCategorieList = sousCategorieRepository.findByCategorieDepense_IdCategoriedepense(idCategorieDepense);
-
-        if (sousCategorieList.isEmpty()) {
-            throw new NoContentException("Aucun sous-catégorie trouvé pour la catégorie avec l'ID : " + idCategorieDepense);
-        }
-
-        return sousCategorieList;
-    }
+//    public List<SousCategorie> listSousCategorie(long idCategorieDepense) {
+//        List<SousCategorie> sousCategorieList = sousCategorieRepository.findByCategorieDepense_IdCategoriedepense(idCategorieDepense);
+//
+//        if (sousCategorieList.isEmpty()) {
+//            throw new NoContentException("Aucun sous-catégorie trouvé pour la catégorie avec l'ID : " + idCategorieDepense);
+//        }
+//
+//        return sousCategorieList;
+//    }
 
 
     public List<CategorieDepense> getAllCategorieDepenseByUser(long idUtilisateur){

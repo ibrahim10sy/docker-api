@@ -34,23 +34,17 @@ public class SousCategorieController {
     public ResponseEntity<SousCategorie> updateSousCategorie(@RequestBody SousCategorie sousCategorie, @PathVariable long id){
         return new ResponseEntity<>(sousCategorieService.modifierSousCategorie(sousCategorie,id), HttpStatus.OK);
     }
-
-    @GetMapping("/liste/{idCategorieDepense}")
-    @Operation(summary = "affichage des categories à travers l'id utilisateur")
-    public ResponseEntity<List<SousCategorie>> listeSousCategorie(@PathVariable long idCategorieDepense){
-        return  new ResponseEntity<>(sousCategorieService.getAllSousCategorieByUser(idCategorieDepense), HttpStatus.OK);
+    @GetMapping("/list/{idCategoriedepense}")
+    @Operation(summary = "liste des sous categories en fonction du categorie")
+    public ResponseEntity<List<SousCategorie>> getSousCategorie(@PathVariable long idCategoriedepense){
+        return new ResponseEntity<>(sousCategorieService.getAllSousCategorie(idCategoriedepense), HttpStatus.OK);
     }
-    public String supprimerSousCategorie(@PathVariable long idSousCategorie) {
-        try {
-            return sousCategorieService.supprimer(idSousCategorie);
-        } catch (EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Catégorie non trouvée avec l'ID spécifié", e);
-        } catch (NoContentException e) {
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT, e.getMessage(), e);
-        } catch (Exception e) {
-            // Gérer d'autres exceptions non prévues ici
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Une erreur interne s'est produite", e);
-        }
+
+    @DeleteMapping("/SupprimerSousCategorie/{idSousCategorie}")
+    @Operation(summary = "suppression d'une sous catégorie")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<String> supprimerSousCategories(@PathVariable long idSousCategorie) {
+        return  new ResponseEntity<>(sousCategorieService.supprimer(idSousCategorie),HttpStatus.OK);
     }
 
 }

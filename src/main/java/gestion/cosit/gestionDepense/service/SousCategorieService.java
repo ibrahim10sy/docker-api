@@ -41,26 +41,23 @@ public class SousCategorieService {
 
         return sousCategorieRepository.save(isCategorieExist);
     }
-
-    public List<SousCategorie> getAllSousCategorieByUser(long idCategorieDepense){
-        List<SousCategorie>  categoriesListe = sousCategorieRepository.findByCategorieDepense_IdCategoriedepense(idCategorieDepense);
-
-        if(categoriesListe.isEmpty()){
-            throw new EntityNotFoundException("Aucun sous categorie categorie trouvé");
-        }
-
-        return categoriesListe;
-    }
+public List<SousCategorie> getAllSousCategorie(long idCategoriedepense){
+        List<SousCategorie> sousCategorieList = sousCategorieRepository.findByCategorieDepenseIdCategoriedepense(idCategoriedepense);
+        if(sousCategorieList.isEmpty())
+            throw new NoContentException("Aucune sous categorie trouvé");
+        return sousCategorieList;
+}
     public String supprimer(long idSousCategorie){
-        CategorieDepense categorie = categorieDepenseRepository.findById(idSousCategorie).orElseThrow(()-> new NoContentException("Sous catégorie non trouvé"));
-        if (categorie == null)
+        SousCategorie sousCategorie = sousCategorieRepository.findByIdSousCategorie(idSousCategorie);
+        if (sousCategorie == null)
             throw new NoContentException("Cette sous categorie n'existe pas");
 
         Depense depense = depenseRepository.findByIdDepense(idSousCategorie);
         if(depense != null)
             throw new NoContentException("On peut pas supprimer une categorie qui est déjà associer à une depense");
 
-        categorieDepenseRepository.delete(categorie);
+        sousCategorieRepository.delete(sousCategorie);
         return "supprimer avec succèss";
     }
+
 }

@@ -23,7 +23,7 @@ public class CategorieDepense {
     private List<Depense> depenseList;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "categorieDepense",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "categorieDepense", cascade = CascadeType.ALL)
     private List<SousCategorie> sousCategorieList;
 
     @ManyToOne

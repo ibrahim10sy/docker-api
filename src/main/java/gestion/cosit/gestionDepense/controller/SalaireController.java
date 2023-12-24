@@ -41,7 +41,7 @@ public class SalaireController {
         return new ResponseEntity<>(salaireService.getAllSalaire(),HttpStatus.OK);
     }
     @GetMapping("/somme")
-    @Operation(summary = "Retourne la somme total de l'ensemble des budget")
+    @Operation(summary = "Retourne la somme total de l'ensemble des salaires")
     public ResponseEntity<HashMap<String,Object>> sommeTotal(){
         return  new ResponseEntity<>(salaireService.sommeOfAllSalaireNotFinish(),HttpStatus.OK);
     }

@@ -169,9 +169,23 @@ public class BudgetService {
         return budgetList;
     }
 
-    public HashMap<String,Object> sommeOfAllBudgetNotFinish(){
+    public HashMap<String,Object> sommeOfAllBudgetNotFinishByUtilisateur(long idUtilisateur){
         HashMap<String , Object> hashMap = new HashMap<>();
-        Integer[][] result = budgetRepository.getSommeOfTotalBudgetNotFinish();
+        Integer[][] result = budgetRepository.getSommeOfTotalBudgetNotFinishByUser(idUtilisateur);
+        if(result[0][0] == null || result[0][1] == null){
+            hashMap.put("Total",0);
+            hashMap.put("Restant",0);
+        }
+        else{
+            hashMap.put("Total",result[0][0]);
+            hashMap.put("Restant",result[0][1]);
+        }
+        return hashMap;
+    }
+
+    public HashMap<String,Object> sommeOfAllBudgetNotFinishByAdmins(long idAdmin){
+        HashMap<String , Object> hashMap = new HashMap<>();
+        Integer[][] result = budgetRepository.getSommeOfTotalBudgetNotFinishByAdmin(idAdmin);
         if(result[0][0] == null || result[0][1] == null){
             hashMap.put("Total",0);
             hashMap.put("Restant",0);

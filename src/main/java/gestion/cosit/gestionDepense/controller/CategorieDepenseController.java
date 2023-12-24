@@ -51,11 +51,11 @@ public class CategorieDepenseController {
         return  new ResponseEntity<>(categorieService.getAllCategorieDepenseByAdmin(idAdmin), HttpStatus.OK);
     }
 
-    @GetMapping("/list/{idCategorieDepense}")
-    @Operation(summary = "affichage des sous categories à travers l'id du catégorie")
-    public ResponseEntity<List<SousCategorie>> listeSousCategorie(@PathVariable long idCategorieDepense){
-        return  new ResponseEntity<>(categorieService.listSousCategorie(idCategorieDepense), HttpStatus.OK);
-    }
+//    @GetMapping("/list/{idCategorieDepense}")
+//    @Operation(summary = "affichage des sous categories à travers l'id du catégorie")
+//    public ResponseEntity<List<SousCategorie>> listeSousCategorie(@PathVariable long idCategorieDepense){
+//        return  new ResponseEntity<>(categorieService.listSousCategorie(idCategorieDepense), HttpStatus.OK);
+//    }
 
     @PutMapping("/update/{id}")
     @Operation(summary = "Modification d'un dépense")

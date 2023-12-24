@@ -16,11 +16,11 @@ public class Depense {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idDepense;
 
-    @Column(length = 255, nullable = false)
-    private String libelle;
+//    @Column(length = 255, nullable = false)
+//    private String libelle;
 
-//    @Column(nullable = true)
-//    private  String image;
+    @Column(nullable = true)
+    private  String image;
 
     @Column(length = 255, nullable = false)
     private String description;

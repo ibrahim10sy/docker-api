@@ -90,10 +90,16 @@ public class BudgetController {
     public ResponseEntity<List<Budget>> sortByMonthAndYear(@RequestParam("date") String date){
         return  new ResponseEntity<>(budgetService.sortBudgetByMonthAndYear(date),HttpStatus.OK);
     }
-    @GetMapping("/somme")
+    @GetMapping("/sommeByUser/{idUtilisateur}")
     @Operation(summary = "Retourne la somme total de l'ensemble des budget")
-    public ResponseEntity<HashMap<String,Object>> sommeTotal(){
-        return  new ResponseEntity<>(budgetService.sommeOfAllBudgetNotFinish(),HttpStatus.OK);
+    public ResponseEntity<HashMap<String,Object>> sommeTotalByUser(@PathVariable long idUtilisateur){
+        return  new ResponseEntity<>(budgetService.sommeOfAllBudgetNotFinishByUtilisateur(idUtilisateur),HttpStatus.OK);
+    }
+
+    @GetMapping("/sommeByAdmin/{idAdmin}")
+    @Operation(summary = "Retourne la somme total de l'ensemble des budget")
+    public ResponseEntity<HashMap<String,Object>> sommeTotalByAdmin(@PathVariable long idAdmin){
+        return  new ResponseEntity<>(budgetService.sommeOfAllBudgetNotFinishByAdmins(idAdmin),HttpStatus.OK);
     }
     @DeleteMapping("/supprimer/{idBudget}")
     @Operation(summary = "suppression d'un  budget")

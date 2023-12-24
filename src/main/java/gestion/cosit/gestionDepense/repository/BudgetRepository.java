@@ -23,7 +23,10 @@ public interface BudgetRepository extends JpaRepository<Budget,Long> {
     @Query(value = "SELECT * FROM Budget WHERE  date_debut LIKE :date ",nativeQuery = true)
     List<Budget> getBudgetByMonthAndYear(@Param("date") String date);
 
-    @Query(value = "SELECT sum(montant), sum(montant_restant) FROM Budget", nativeQuery = true)
-    Integer[][] getSommeOfTotalBudgetNotFinish();
+    @Query(value = "SELECT sum(montant), sum(montant_restant) FROM Budget WHERE utilisateur_id_utilisateur = :idUtilisateur",nativeQuery = true)
+    Integer[][] getSommeOfTotalBudgetNotFinishByUser(@Param("idUtilisateur") long idUtilisateur);
+
+    @Query(value = "SELECT sum(montant), sum(montant_restant) FROM Budget WHERE admin_id_admin = :idAdmin",nativeQuery = true)
+    Integer[][] getSommeOfTotalBudgetNotFinishByAdmin(@Param("idAdmin") long idAdmin);
 
 }

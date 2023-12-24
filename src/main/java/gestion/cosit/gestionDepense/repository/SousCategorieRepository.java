@@ -11,6 +11,7 @@ import java.util.List;
 public interface SousCategorieRepository extends JpaRepository<SousCategorie, Long> {
     SousCategorie findByIdSousCategorie(long id);
     //    List<SousCategorie> findByCategorie_idCategorie(long id);
-    List<SousCategorie> findByCategorieDepense_IdCategoriedepense(long idCategorieDepense);
+//    List<SousCategorie> findByCategorieDepense_IdCategoriedepense(long idCategorieDepense);
 
+    List<SousCategorie> findByCategorieDepenseIdCategoriedepense(long idCategoriedepense);
 }
