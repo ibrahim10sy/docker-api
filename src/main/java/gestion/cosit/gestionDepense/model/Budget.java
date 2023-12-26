@@ -1,11 +1,13 @@
 package gestion.cosit.gestionDepense.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -25,21 +27,25 @@ public class Budget {
     @Column(nullable = false)
     private int montantRestant;
 
-    @NotNull(message = "Désole la date ne doit pas etre null")
+    @NotNull(message = "Désolé, la date ne doit pas être null")
     @Column(nullable = false)
-    private LocalDate dateDebut;
+    @JsonFormat(pattern="yyyy-MM-dd")
+    private Date dateDebut;
 
 
+    @NotNull(message = "Désolé, la date ne doit pas être null")
     @Column(nullable = false)
-    private LocalDate dateFin;
+    @JsonFormat(pattern="yyyy-MM-dd")
+    private Date dateFin;
 
     @NotNull
     @ManyToOne
     private Admin admin;
 
-    @NotNull
-    @ManyToOne
+
+    @ManyToOne()
     private Utilisateur utilisateur;
+
     @OneToMany(mappedBy = "budget",cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Depense> depenseList;

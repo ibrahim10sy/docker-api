@@ -11,8 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -36,11 +40,27 @@ public class BudgetService {
 //        Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(budget.getUtilisateur().getIdUtilisateur());
 
 
-        LocalDate toDay = LocalDate.now(); // Obtention de la date du jour en type LocalDate
-        LocalDate dateDebut = budget.getDateDebut();
-        LocalDate jourMaxDuMois = dateDebut.with(TemporalAdjusters.lastDayOfMonth()); // Obtention du dernier date du mois actuel
-        budget.setDateFin(jourMaxDuMois);
+        // Obtention de la date du jour en type LocalDate
+        LocalDate toDay = LocalDate.now();
+
+// Obtention de la date de début en type Date
+        Date dateDebut = budget.getDateDebut();
+
+// Conversion de la date de début en type LocalDate
+        Instant instant = dateDebut.toInstant();
+        ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+        LocalDate localDateDebut = zonedDateTime.toLocalDate();
+
+// Obtention du dernier jour du mois actuel
+        LocalDate jourMaxDuMois = localDateDebut.with(TemporalAdjusters.lastDayOfMonth());
+
+// Conversion de la date de fin en type Date
+        Date dateFin = Date.from(jourMaxDuMois.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+// Mise à jour de l'objet Budget
+        budget.setDateFin(dateFin);
         budget.setMontantRestant(budget.getMontant());
+
         return budgetRepository.save(budget);
     }
 
@@ -69,37 +89,32 @@ public class BudgetService {
         }
     }
 
-//    public Budget updateBudget(Budget budget, long id) {
-//        // Récupérer le budget existant par son ID
-//        Budget existingBudget = budgetRepository.findById(id)
-//                .orElseThrow(() -> new EntityNotFoundException("Ce budget n'existe pas avec l'ID spécifique " + id));
-//
-//        // Mettre à jour les champs du budget existant avec les valeurs du nouveau budget
-//        existingBudget.setDescription(budget.getDescription());
-//        existingBudget.setMontant(budget.getMontant());
-//        existingBudget.setDateDebut(budget.getDateDebut());
-//
-//        // Calculer la date de fin en utilisant le dernier jour du mois de la date de début
-//        LocalDate dateDebut = existingBudget.getDateDebut();
-//        LocalDate jourMaxDuMois = dateDebut.with(TemporalAdjusters.lastDayOfMonth());
-//        existingBudget.setDateFin(jourMaxDuMois);
-//
-//        // Mettre à jour le montant restant avec le montant du nouveau budget
-//        existingBudget.setMontantRestant(budget.getMontant());
-//
-//        // Sauvegarder les modifications dans la base de données en utilisant le repository
-//        return budgetRepository.save(existingBudget);
-//    }
     public Budget updateBudget(Budget budget, long id){
         Budget existingBudget = budgetRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Ce budget n'existe pas avec l'ID spécifique " + id));
         existingBudget.setDescription(budget.getDescription());
         existingBudget.setMontant(budget.getMontant());
         existingBudget.setDateDebut(budget.getDateDebut());
-        LocalDate date = budget.getDateDebut();
-        LocalDate jourMaxDuMois = date.with(TemporalAdjusters.lastDayOfMonth());
-        existingBudget.setDateFin(jourMaxDuMois);
+        // Calcul du montant restant
+        int restant =existingBudget.getMontantRestant();
+        restant += (budget.getMontant() - existingBudget.getMontant());
+        existingBudget.setMontantRestant(restant);
+        // Obtention de la date de début en type Date
+        Date dateDebut = budget.getDateDebut();
 
+// Conversion de la date de début en type LocalDate
+        Instant instant = dateDebut.toInstant();
+        ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+        LocalDate localDateDebut = zonedDateTime.toLocalDate();
+
+// Obtention du dernier jour du mois actuel
+        LocalDate jourMaxDuMois = localDateDebut.with(TemporalAdjusters.lastDayOfMonth());
+
+// Conversion de la date de fin en type Date
+        Date dateFin = Date.from(jourMaxDuMois.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+// Mise à jour de l'objet Budget
+        existingBudget.setDateFin(dateFin);
         return budgetRepository.save(existingBudget);
     }
 
@@ -203,8 +218,8 @@ public class BudgetService {
         if (budgetVerif == null)
             throw  new EntityNotFoundException("Aucun budget trouvÃ©");
 
-        if (budgetVerif.getDateFin().isBefore(LocalDate.now()))
-            throw new BadRequestException("DÃ©solÃ© vous ne pouvez pas modifier un budget dÃ©jÃ  expirer");
+//        if (budgetVerif.getDateFin().isBefore(LocalDate.now()))
+//            throw new BadRequestException("DÃ©solÃ© vous ne pouvez pas modifier un budget dÃ©jÃ  expirer");
 
         if (!budgetVerif.getDepenseList().isEmpty())
             throw new BadRequestException("DÃ©solÃ© vous ne pouvez plus supprimer cet budget car possÃ¨de dÃ©jÃ  au moins une depense");

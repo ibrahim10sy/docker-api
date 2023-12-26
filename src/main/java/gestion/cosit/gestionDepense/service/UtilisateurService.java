@@ -65,10 +65,10 @@ public class UtilisateurService {
     }
 
     //Méthode de recupperation des users
-    public List<Utilisateur> getAllUtisateur(){
+    public List<Utilisateur> getAllUtisateur() throws Exception {
         List<Utilisateur> utilisateurs = utilisateurRepository.findAll();
         if(utilisateurs.isEmpty()){
-            throw  new NoContentException("Aucun utilisateur trouvé");
+            throw  new Exception("Aucun utilisateur trouvé");
         }
         return utilisateurs;
     }

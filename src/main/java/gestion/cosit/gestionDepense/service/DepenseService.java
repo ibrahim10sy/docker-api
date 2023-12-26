@@ -235,8 +235,7 @@ public class DepenseService {
     }
     public List<Depense> getDepenseByIdBudget(long idBudget){
         List<Depense> depensesList = depenseRepository.findByBudgetIdBudget(idBudget);
-        if (depensesList.isEmpty())
-            throw new EntityNotFoundException("Aucune depenses trouvée");
+
         return depensesList;
 
     }
