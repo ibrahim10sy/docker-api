@@ -7,7 +7,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -23,7 +25,10 @@ public class Demande {
     @Column(nullable = false)
     private int montantDemande;
 
-    private LocalDate dateDemande;
+    @NotNull(message = "Désolé, la date ne doit pas être null")
+    @Column(nullable = false)
+    @JsonFormat(pattern="yyyy-MM-dd")
+    private Date dateDemande;
 
     @Column(nullable = true)
     private boolean autorisationDirecteur;
@@ -41,4 +46,9 @@ public class Demande {
     @OneToOne
     @JsonIgnore
     private  Depense depense;
+
+    @OneToMany(mappedBy = "demande", orphanRemoval = true)
+    @JsonIgnore
+    private List<SendNotification> notifications;
+
 }

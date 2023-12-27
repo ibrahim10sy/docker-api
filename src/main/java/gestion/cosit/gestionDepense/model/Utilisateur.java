@@ -54,5 +54,9 @@ public class Utilisateur {
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Depense> depenseList;
+
+    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<SendNotification> sendNotificationList;
 }
 

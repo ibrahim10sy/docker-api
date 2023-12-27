@@ -176,17 +176,31 @@ public class DepenseService {
         return depenseRepository.save(isDepenseExist);
     }
 
-    public HashMap<String,Object> sommeOfAllDepense(long idBudget){
-        HashMap<String , Object> hashMap = new HashMap<>();
-        Integer[] result = depenseRepository.getSommeOfTotalDepenseByIdBudget(idBudget);
-        if(result[0] == null || result[0] == null){
-            hashMap.put("Total",0);
+    public HashMap<String, Object> sommeTotalDesDepenses(long idBudget) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+
+        Integer somme = depenseRepository.getSommeTotalDepensesParIdBudget(idBudget);
+
+        // Vérifier si la somme est nulle
+        if (somme == null) {
+            hashMap.put("Total", 0);
+        } else {
+            hashMap.put("Total", somme);
         }
-        else{
-            hashMap.put("Total",result[0]);
-        }
+
         return hashMap;
     }
+//    public HashMap<String,Object> sommeOfAllDepense(long idBudget){
+//        HashMap<String , Object> hashMap = new HashMap<>();
+//        Integer[] result = depenseRepository.getSommeOfTotalDepenseByIdBudget(idBudget);
+//        if(result[0] == null || result[0] == null){
+//            hashMap.put("Total",0);
+//        }
+//        else{
+//            hashMap.put("Total",result[0]);
+//        }
+//        return hashMap;
+//    }
 
     public List<Depense> sortBudgetByMonthAndYear( String date){
 

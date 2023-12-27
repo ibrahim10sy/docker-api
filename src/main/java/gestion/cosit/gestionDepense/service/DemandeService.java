@@ -8,10 +8,16 @@ import gestion.cosit.gestionDepense.repository.AdminRepository;
 import gestion.cosit.gestionDepense.repository.DemandeRepository;
 import gestion.cosit.gestionDepense.repository.UtilisateurRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -23,13 +29,30 @@ public class DemandeService {
     private UtilisateurRepository utilisateurRepository;
     @Autowired
     private AdminRepository adminRepository;
+    @Autowired
+    private SendNotifService sendNotifService;
 
     public Demande saveDemande(Demande demande){
         Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(demande.getUtilisateur().getIdUtilisateur());
         if(utilisateur == null)
             throw new NoContentException("utilisateur non trouvé");
-        LocalDate toDay = LocalDate.now();
-        demande.setDateDemande(toDay);
+       Admin admin = adminRepository.findByIdAdmin(demande.getAdmin().getIdAdmin());
+       if(admin==null)
+           throw new NoContentException("Admin non trouvé");
+
+       Date dateEnvoie = new Date();
+       Instant instant = dateEnvoie.toInstant();
+       ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+       demande.setDateDemande(dateEnvoie);
+
+        try {
+            System.out.println("Debut de l'envoie dans le servive demande");
+            sendNotifService.sendDemande(demande);
+        } catch (BadRequestException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Fin de l'envoie dans le servive demande");
+
         return demandeRepositroy.save(demande);
     }
 
@@ -67,7 +90,7 @@ public class DemandeService {
         return demandeRepositroy.save(demandes);
     }
 
-    public Demande approuveByAdmin(Demande demande, long id) {
+    public Demande approuveByAdmin(Demande demande, long id) throws BadRequestException {
         Admin admin = adminRepository.findByIdAdmin(demande.getAdmin().getIdAdmin());
         if (admin == null)
             throw new NoContentException("Admin non trouvé");
@@ -75,6 +98,7 @@ public class DemandeService {
         Demande demandes = demandeRepositroy.findById(id).orElseThrow(() -> new EntityNotFoundException("Demande non trouvé"));
         demandes.setAutorisationAdmin(true);
 
+        sendNotifService.sendApprouveDemande(demande);
         return demandeRepositroy.save(demandes);
     }
 

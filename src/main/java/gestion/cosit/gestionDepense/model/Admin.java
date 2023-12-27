@@ -47,4 +47,8 @@ public class Admin {
     @OneToMany(mappedBy = "admin",cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Depense> depenseList;
+
+    @OneToMany(mappedBy = "admin",cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<SendNotification> sendNotificationList;
 }

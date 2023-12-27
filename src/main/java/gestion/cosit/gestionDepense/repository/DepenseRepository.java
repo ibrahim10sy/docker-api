@@ -31,6 +31,5 @@ public interface DepenseRepository extends JpaRepository<Depense,Long> {
     List<Depense> getDepenseByMonthAndYear(@Param("date") String date);
 
     @Query(value = "SELECT sum(montant_depense) FROM Depense WHERE budget_id_budget = :idBudget",nativeQuery = true)
-    Integer[] getSommeOfTotalDepenseByIdBudget(@Param("idBudget") long idBudget);
-}
+    Integer getSommeTotalDepensesParIdBudget(@Param("idBudget") long idBudget);}
 

@@ -82,11 +82,16 @@ public class DepenseController {
     public ResponseEntity<List<Depense>> sortByMonthAndYear(@RequestParam("date") String date){
         return  new ResponseEntity<>(depenseService.sortBudgetByMonthAndYear(date),HttpStatus.OK);
     }
-    @GetMapping("/somme/{idBudget}")
-    @Operation(summary = "Retourne la somme total des depenses  d'un budget")
-    public ResponseEntity<HashMap<String,Object>> sommeTotalByAdmin(@PathVariable long idBudget){
-        return  new ResponseEntity<>(depenseService.sommeOfAllDepense(idBudget),HttpStatus.OK);
+    @GetMapping("/sommeTotal/{idBudget}")
+    public ResponseEntity<HashMap<String, Object>> getSommeTotalDepenses(@PathVariable long idBudget) {
+        HashMap<String, Object> resultat = depenseService.sommeTotalDesDepenses(idBudget);
+        return new ResponseEntity<>(resultat, HttpStatus.OK);
     }
+//    @GetMapping("/somme/{idBudget}")
+//    @Operation(summary = "Retourne la somme total des depenses  d'un budget")
+//    public ResponseEntity<HashMap<String,Object>> sommeTotalByAdmin(@PathVariable long idBudget){
+//        return  new ResponseEntity<>(depenseService.sommeOfAllDepense(idBudget),HttpStatus.OK);
+//    }
 
     @GetMapping("/listeByBudget/{idBudget}")
     @Operation(summary = "Affichage des dépenses")

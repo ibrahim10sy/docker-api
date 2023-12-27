@@ -5,6 +5,7 @@ import gestion.cosit.gestionDepense.model.Demande;
 import gestion.cosit.gestionDepense.service.DemandeService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,16 +42,21 @@ public class DemandeController {
 
     @PutMapping("/approuveDemandeByAdmin/{id}")
     @Operation(summary = "Autorisation de la demande par l'admin")
-    public ResponseEntity<Demande> approuveDemandesByAdmin(@RequestBody Demande demande, @PathVariable long id){
+    public ResponseEntity<Demande> approuveDemandesByAdmin(@RequestBody Demande demande, @PathVariable long id) throws BadRequestException {
         return new ResponseEntity<>(demandeService.approuveByAdmin(demande,id), HttpStatus.OK);
     }
 
-    @GetMapping("read/{idUtilisateur}")
+    @GetMapping("/read/{idUtilisateur}")
     @Operation(summary = "Liste des demande ")
     public ResponseEntity<List<Demande>> getAllByUtilisateur(@PathVariable long idUtilisateur){
         return new ResponseEntity<>(demandeService.getAllDemandeByIdUtilisateur(idUtilisateur), HttpStatus.OK);
     }
 
+    @GetMapping("/list")
+    @Operation(summary = "Liste des demande ")
+    public ResponseEntity<List<Demande>> getAllDemandes(){
+        return new ResponseEntity<>(demandeService.getAllDemande(), HttpStatus.OK);
+    }
     @DeleteMapping("/delete/{id}")
     @Operation(summary = "Suppression des demandes")
     @ResponseStatus(HttpStatus.OK) // Indique le code de statut HTTP pour une suppression réussie
