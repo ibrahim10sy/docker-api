@@ -64,11 +64,16 @@ public class BudgetController {
     }
 
     @GetMapping("/listeByUser/{idUtilisateur}")
-    @Operation(summary = "affichage des categories à travers l'id utilisateur")
+    @Operation(summary = "affichage des budgets à travers l'id utilisateur")
     public ResponseEntity<List<Budget>> listeBudgetByUser(@PathVariable long idUtilisateur){
         return  new ResponseEntity<>(budgetService.getAllBudgetByUser(idUtilisateur), HttpStatus.OK);
     }
 
+    @GetMapping("/listeByAdmin/{idAdmin}")
+    @Operation(summary = "affichage des budgets à travers l'id admin")
+    public ResponseEntity<List<Budget>> listeBudgetByAdmin(@PathVariable long idAdmin){
+        return  new ResponseEntity<>(budgetService.getAllBudgetByAdmin(idAdmin), HttpStatus.OK);
+    }
 //    @GetMapping("/readByIdAdmin/{idAdmin}")
 //    @Operation(summary = "Affichage la liste  des budgets par id user")
 //    public ResponseEntity<List<Budget>> listeBudgetByAdmin(long idAdmin){

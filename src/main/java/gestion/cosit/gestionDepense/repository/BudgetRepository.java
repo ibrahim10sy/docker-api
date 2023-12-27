@@ -19,7 +19,7 @@ public interface BudgetRepository extends JpaRepository<Budget,Long> {
     Budget findByDateFin(LocalDate dateFin);
     List<Budget> findByDescriptionContaining( String desc);
     List<Budget> findByUtilisateurIdUtilisateur(long idUtilisateur);
-//    List<Budget> findByAdminIdAdmin(long idAdmin);
+    List<Budget> findByAdminIdAdmin(long idAdmin);
     @Query(value = "SELECT * FROM Budget WHERE  date_debut LIKE :date ",nativeQuery = true)
     List<Budget> getBudgetByMonthAndYear(@Param("date") String date);
 

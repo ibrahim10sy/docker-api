@@ -137,6 +137,16 @@ public class BudgetService {
 
         return budgetListe;
     }
+
+    public List<Budget> getAllBudgetByAdmin(long idAdmin){
+        List<Budget>  budgetListe = budgetRepository.findByAdminIdAdmin(idAdmin);
+
+        if(budgetListe.isEmpty()){
+            throw new EntityNotFoundException("Aucun budget trouvé pour ce utilisateur");
+        }
+
+        return budgetListe;
+    }
     public List<Budget> allBudgetByUser(long idUtilisateur){
         List<Budget> budgetList = budgetRepository.findByUtilisateurIdUtilisateur(idUtilisateur);
 
