@@ -19,14 +19,13 @@ public class Demande {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idDemande;
 
-    @Column(length = 255, nullable = false)
+    @Column(length = 255, nullable = true)
     private String motif;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private int montantDemande;
 
-    @NotNull(message = "Désolé, la date ne doit pas être null")
-    @Column(nullable = false)
+
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date dateDemande;
 

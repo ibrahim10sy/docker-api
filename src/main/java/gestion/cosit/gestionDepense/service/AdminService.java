@@ -87,7 +87,7 @@ public class AdminService {
         admin1.setNom(admin.getNom());
         admin1.setPrenom(admin.getPrenom());
         admin1.setEmail(admin.getEmail());
-        admin1.setMotDePasse(admin.getMotDePasse());
+        admin1.setPassWord(admin.getPassWord());
 
         if(multipartFile != null){
             String location = "C:\\xampp\\htdocs\\cosit";
@@ -133,16 +133,16 @@ public class AdminService {
         return "Compte supprimé avec succèss";
     }
 
-    public Admin connexion(String email, String motDePasse){
-        if(adminRepository.findByEmailAndMotDePasse(email,motDePasse) != null){
-            return adminRepository.findByEmailAndMotDePasse(email, motDePasse);
+    public Admin connexion(String email, String passWord){
+        if(adminRepository.findByEmailAndAndPassWord(email,passWord) != null){
+            return adminRepository.findByEmailAndAndPassWord(email, passWord);
         }else{
             throw  new NotFoundException("Ce compte n'existe pas");
         }
     }
 
-    public Admin connection(String email, String motDePasse){
-         Admin admin= adminRepository.findByEmailAndMotDePasse(email, motDePasse);
+    public Admin connection(String email, String passWord){
+         Admin admin= adminRepository.findByEmailAndAndPassWord(email, passWord);
         if (admin == null) {
             throw new EntityNotFoundException("Ce utilisateur n'existe pas");
         }

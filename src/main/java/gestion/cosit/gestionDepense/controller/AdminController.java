@@ -70,7 +70,7 @@ public class AdminController {
     @PostMapping("/login")
     @Operation(summary = "Connexion de l'admin")
     public Object connexion(@RequestParam("email") String email,
-                            @RequestParam("motDePasse") String motDePasse) {
-        return adminService.connection(email, motDePasse);
+                            @RequestParam("passWord") String passWord) {
+        return adminService.connection(email, passWord);
     }
 }

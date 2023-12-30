@@ -77,42 +77,34 @@ public class SendNotifService {
         }
     }
 
-    public void sendApprouveDemande(Demande demande) throws BadRequestException {
-        String msg;
-        SendNotification sendNotif = new SendNotification();
-        Utilisateur utilisateur = demande.getUtilisateur();
-//        Demande demande1 = demande;
-        System.out.println("User dans send service"+utilisateur);
-        Admin admin = demande.getAdmin();
-        System.out.println("Admin dans send "+admin);
-
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-
-        msg = "Bonjour Mr "+  utilisateur.getNom().toUpperCase() + " "+ utilisateur.getPrenom().toUpperCase()+ ".\n Votre demande de a été approuver par Mr "+admin.getNom().toUpperCase()  + " " + admin.getPrenom().toUpperCase() ;
-
+    public void sendNotificationForApproval(Demande demande) throws Exception {
         try {
-            // Sauvegarder l'entité Demande d'abord
-            demandeRepository.save(demande);
+            // Créer le message de notification
+            String msg = "Bonjour Mr " + demande.getUtilisateur().getNom().toUpperCase() + " " +
+                    demande.getUtilisateur().getPrenom().toUpperCase() +
+                    ".\n Votre demande a été approuvée par Mr " + demande.getAdmin().getNom().toUpperCase() +
+                    " " + demande.getAdmin().getPrenom().toUpperCase();
 
-            sendNotif.setMessage(msg);
+            // Configurer l'email
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setFrom(sender);
-            mailMessage.setTo(utilisateur.getEmail());
-            mailMessage.setText(sendNotif.getMessage());
+            mailMessage.setTo(demande.getUtilisateur().getEmail());
+            mailMessage.setText(msg);
             mailMessage.setSubject("Alerte demande ");
 
+            // Envoyer l'email
             javaMailSender.send(mailMessage);
 
-            Date dateEnvoie = new Date();
-            Instant instant = dateEnvoie.toInstant();
-            ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
-            demande.setDateDemande(dateEnvoie);
-            sendNotif.setUtilisateur(utilisateur);
-            sendNotif.setAdmin(admin);
-            sendNotif.setDate(dateEnvoie);
+            // Sauvegarder la notification
+            SendNotification sendNotif = new SendNotification();
+            sendNotif.setMessage(msg);
+            sendNotif.setUtilisateur(demande.getUtilisateur());
+            sendNotif.setAdmin(demande.getAdmin());
+            sendNotif.setDate(new Date());
             sendNotif.setDemande(demande);
             sendNotifRepository.save(sendNotif);
-        }catch (Exception e){
-            throw new BadRequestException(e.getMessage());
+        } catch (Exception e) {
+            throw new Exception("Erreur lors de l'envoi de notification par e-mail : " + e.getMessage());
         }
     }
     public List<SendNotification> getAllNotif(){

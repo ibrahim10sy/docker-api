@@ -94,18 +94,48 @@ public class DemandeService {
 
         return demandeRepositroy.save(demandes);
     }
+//    public Demande approuveByAdmin(Demande demande, long id) throws BadRequestException {
+//        Admin admin = adminRepository.findByIdAdmin(demande.getAdmin().getIdAdmin());
+//        if (admin == null)
+//            throw new NoContentException("Admin non trouvé");
+//
+//        Demande demandes = demandeRepositroy.findById(id).orElseThrow(() -> new EntityNotFoundException("Demande non trouvé"));
+//        demandes.setAutorisationAdmin(true);
+//       try {
+//           sendNotifService.sendApprouveDemande(demandes);
+//       }catch (Exception e){
+//
+//       }
+//        return demandeRepositroy.save(demandes);
+//
+//    }
+public Demande approuveByAdmin(Demande demande, long id) throws Exception {
+    Demande demandes = demandeRepositroy.findById(id).orElseThrow(() -> new EntityNotFoundException("Demande non trouvée"));
 
-    public Demande approuveByAdmin(Demande demande, long id) throws BadRequestException {
-        Demande demandes = demandeRepositroy.findById(id).orElseThrow(()-> new EntityNotFoundException("Demande non trouvé"));
+    demandes.setAutorisationAdmin(true);
+    try {
+        // Approuver la demande en sauvegardant les modifications
+        demandeRepositroy.save(demandes);
 
-        demandes.setMotif(demande.getMotif());
-        demandes.setMontantDemande(demande.getMontantDemande());
-        demandes.setAutorisationAdmin(true);
-//        demandes.setDateDemande(demandes.getDateDemande());
-
-        sendNotifService.sendApprouveDemande(demande);
-        return demandeRepositroy.save(demandes);
+        // Envoyer la notification par e-mail
+        sendNotifService.sendNotificationForApproval(demandes);
+    } catch (Exception e) {
+        throw new Exception("Erreur lors de l'approbation de la demande : " + e.getMessage());
     }
+    return demandes;
+}
+//    public Demande approuveByAdmin(Demande demande, long id) throws Exception {
+//        Demande demandes = demandeRepositroy.findById(id).orElseThrow(()-> new EntityNotFoundException("Demande non trouvé"));
+//
+//        demandes.setAutorisationAdmin(true);
+//        try {
+//            System.out.println("Debut de l'envoie dans le servive demande");
+//            sendNotifService.sendNotification(demandes);
+//        }catch (Exception e){
+//            throw new Exception("Eurreur lors de l'envoie");
+//        }
+//        return demandeRepositroy.save(demandes);
+//    }
 
     public String deleteDemande(long id){
         Demande demande = demandeRepositroy.findByIdDemande(id);

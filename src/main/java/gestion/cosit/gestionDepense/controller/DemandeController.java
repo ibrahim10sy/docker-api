@@ -42,7 +42,7 @@ public class DemandeController {
 
     @PutMapping("/approuveDemandeByAdmin/{id}")
     @Operation(summary = "Autorisation de la demande par l'admin")
-    public ResponseEntity<Demande> approuveDemandesByAdmin(@RequestBody Demande demande ,@PathVariable long id) throws BadRequestException {
+    public ResponseEntity<Demande> approuveDemandesByAdmin(@RequestBody Demande demande ,@PathVariable long id) throws Exception {
         Demande demandeApprouvee = demandeService.approuveByAdmin(demande,id);
         return new ResponseEntity<>(demandeApprouvee, HttpStatus.OK);
     }
