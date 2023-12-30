@@ -124,19 +124,6 @@ public Demande approuveByAdmin(Demande demande, long id) throws Exception {
     }
     return demandes;
 }
-//    public Demande approuveByAdmin(Demande demande, long id) throws Exception {
-//        Demande demandes = demandeRepositroy.findById(id).orElseThrow(()-> new EntityNotFoundException("Demande non trouvé"));
-//
-//        demandes.setAutorisationAdmin(true);
-//        try {
-//            System.out.println("Debut de l'envoie dans le servive demande");
-//            sendNotifService.sendNotification(demandes);
-//        }catch (Exception e){
-//            throw new Exception("Eurreur lors de l'envoie");
-//        }
-//        return demandeRepositroy.save(demandes);
-//    }
-
     public String deleteDemande(long id){
         Demande demande = demandeRepositroy.findByIdDemande(id);
         if(demande == null)

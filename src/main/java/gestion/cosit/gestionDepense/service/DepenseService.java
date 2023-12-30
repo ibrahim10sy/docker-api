@@ -33,43 +33,113 @@ public class DepenseService {
         @Autowired
         AdminRepository adminRepository;
 
-    public Depense saveDepenseByUser(Depense depense) throws BadRequestException {
+//    public Depense saveDepenseByUser(Depense depense) throws BadRequestException {
+//
+//        Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(depense.getUtilisateur().getIdUtilisateur());
+//        CategorieDepense categorieDepense = categorieRepository.findByIdCategoriedepense(depense.getCategorieDepense().getIdCategoriedepense());
+//        Budget budget = budgetRepository.findByIdBudget(depense.getBudget().getIdBudget());
+//
+//        if(budget == null)
+//            throw new BadRequestException("Desolé ce budget n'existe pas");
+//
+//        if(categorieDepense == null)
+//            throw new BadRequestException("Desolé cette catégorie n'existe pas");
+//
+//        if (utilisateur == null)
+//            throw new BadRequestException("User invalid");
+//
+//
+////        if (depense.getMontantDepense() > budget.getMontantRestant() ) {
+////            Demande demande = demandeRepositroy.findByIdDemande(depense.getDemande().getIdDemande());
+////            System.out.println("Condition vérifier");
+////            if (demande == null) {
+////                throw new BadRequestException("La demande associée à la dépense n'existe pas");
+////            }
+////
+////            System.out.println("La demande est " + demande);
+////        }
+//
+//        // Mettre à jour le montant restant du budget
+//        budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
+//        System.out.println(depense);
+//        budgetRepository.save(budget);
+//
+//        // Enregistrer la dépense mise à jour
+//        return depenseRepository.save(depense);
+//    }
+public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) throws Exception {
+    Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(depense.getUtilisateur().getIdUtilisateur());
+    CategorieDepense categorieDepense = categorieRepository.findByIdCategoriedepense(depense.getCategorieDepense().getIdCategoriedepense());
+    Budget budget = budgetRepository.findByIdBudget(depense.getBudget().getIdBudget());
 
-        Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(depense.getUtilisateur().getIdUtilisateur());
-        CategorieDepense categorieDepense = categorieRepository.findByIdCategoriedepense(depense.getCategorieDepense().getIdCategoriedepense());
-        Budget budget = budgetRepository.findByIdBudget(depense.getBudget().getIdBudget());
+    if(budget == null)
+        throw new BadRequestException("Desolé ce budget n'existe pas");
 
-        if(budget == null)
-            throw new BadRequestException("Desolé ce budget n'existe pas");
+    if(categorieDepense == null)
+        throw new BadRequestException("Desolé cette catégorie n'existe pas");
 
-        if(categorieDepense == null)
-            throw new BadRequestException("Desolé cette catégorie n'existe pas");
+    if (utilisateur == null)
+        throw new BadRequestException("Utilisateur invalid");
 
-        if (utilisateur == null)
-            throw new BadRequestException("User invalid");
-
-        Demande demande = demandeRepositroy.findByIdDemande(depense.getDemande().getIdDemande());
-        if (depense.getMontantDepense() > budget.getMontantRestant() ) {
-            System.out.println("Condition vérifier");
-            if (demande == null) {
-                throw new BadRequestException("La demande associée à la dépense n'existe pas");
-            }
-
-            System.out.println("La demande est " + demande);
-
-//            if (depense.getMontantDepense() > demande.getMontantDemande()) {
-//                throw new BadRequestException("Le montant de la dépense ne doit pas être supérieur à celui du montant demandé " + demande.getMontantDemande());
+//    if (depense.getMontantDepense() > budget.getMontantRestant() ) {
+//            Demande demande = demandeRepositroy.findByIdDemande(depense.getDemande().getIdDemande());
+//            System.out.println("Condition vérifier");
+//            if (demande == null) {
+//                throw new BadRequestException("La demande associée à la dépense n'existe pas");
 //            }
+//
+//            System.out.println("La demande est " + demande);
+//        }
+
+    if(multipartFile != null){
+        String location = "C:\\xampp\\htdocs\\cosit";
+        try{
+            Path rootlocation = Paths.get(location);
+            if(!Files.exists(rootlocation)){
+                Files.createDirectories(rootlocation);
+                Files.copy(multipartFile.getInputStream(),
+                        rootlocation.resolve(multipartFile.getOriginalFilename()));
+                depense.setImage("cosit/"
+                        +multipartFile.getOriginalFilename());
+            }else{
+                try {
+                    String nom = location+"\\"+multipartFile.getOriginalFilename();
+                    Path name = Paths.get(nom);
+                    if(!Files.exists(name)){
+                        Files.copy(multipartFile.getInputStream(),
+                                rootlocation.resolve(multipartFile.getOriginalFilename()));
+                        depense.setImage("cosit/"
+                                +multipartFile.getOriginalFilename());
+                    }else{
+                        Files.delete(name);
+                        Files.copy(multipartFile.getInputStream(),rootlocation.resolve(multipartFile.getOriginalFilename()));
+                        depense.setImage("cosit/"
+                                +multipartFile.getOriginalFilename());
+                    }
+                }catch (Exception e){
+                    throw new Exception("Impossible de télécharger l\'image");
+                }
+            }
+        } catch (Exception e){
+            throw new Exception(e.getMessage());
         }
-
-        // Mettre à jour le montant restant du budget
-        budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
-        System.out.println(depense);
-        budgetRepository.save(budget);
-
-        // Enregistrer la dépense mise à jour
-        return depenseRepository.save(depense);
     }
+
+    if (depense.getMontantDepense() > budget.getMontantRestant()) {
+        throw new BadRequestException("Le montant de la dépense ne doit pas être supérieur à celui du montant restant du budget " );
+    } else if (budget.getMontantRestant() == 0) {
+        throw new BadRequestException("Le  montant restant du budget est atteint" );
+
+    }
+
+    // Mettre à jour le montant restant du budget
+    budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
+    System.out.println(depense);
+    budgetRepository.save(budget);
+
+    // Enregistrer la dépense mise à jour
+    return depenseRepository.save(depense);
+}
     public Depense saveDepenseByAdmin(Depense depense , MultipartFile multipartFile) throws Exception {
         Admin admin = adminRepository.findByIdAdmin(depense.getAdmin().getIdAdmin());
         CategorieDepense categorieDepense = categorieRepository.findByIdCategoriedepense(depense.getCategorieDepense().getIdCategoriedepense());

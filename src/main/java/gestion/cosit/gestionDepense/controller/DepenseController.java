@@ -25,17 +25,23 @@ public class DepenseController {
     @Autowired
     private DepenseService depenseService;
 
-        @PostMapping("/createByUser")
-    @Operation(summary = "création de dépense")
-    public ResponseEntity<Depense> createDepense(@Valid @RequestBody Depense depense) throws BadRequestException {
-        return new ResponseEntity<>(depenseService.saveDepenseByUser(depense), HttpStatus.CREATED);
-    }
 
-//    @PostMapping("/createByAdmin")
-//    @Operation(summary = "création de dépense")
-//    public ResponseEntity<Depense> createDepenseByAdmin(@Valid @RequestBody Depense depense) throws BadRequestException {
-//        return new ResponseEntity<>(depenseService.saveDepenseByAdmin(depense), HttpStatus.CREATED);
-//    }
+    @PostMapping("/createByUser")
+    @Operation(summary = "création de dépense")
+    public ResponseEntity<Depense> createDepenseByUser(
+            @Valid @RequestParam("depense") String depenses,
+            @RequestParam(value = "image" , required = false) MultipartFile multipartFile
+    ) throws Exception {
+        Depense depense1 = new Depense();
+        try {
+            depense1 = new JsonMapper().readValue(depenses , Depense.class);
+        }catch (JsonProcessingException e){
+            throw new Exception(e.getMessage());
+        }
+
+        Depense saveDepenses = depenseService.saveDepenseByUser(depense1, multipartFile);
+        return new ResponseEntity<>(saveDepenses, HttpStatus.CREATED);
+    }
     @PostMapping("/createByAdmin")
     @Operation(summary = "création de dépense")
     public ResponseEntity<Depense> createDepense(

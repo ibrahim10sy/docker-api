@@ -144,7 +144,7 @@ public class AdminService {
     public Admin connection(String email, String passWord){
          Admin admin= adminRepository.findByEmailAndAndPassWord(email, passWord);
         if (admin == null) {
-            throw new EntityNotFoundException("Ce utilisateur n'existe pas");
+            throw new EntityNotFoundException("Ce compte n'existe pas");
         }
 
         return admin;
