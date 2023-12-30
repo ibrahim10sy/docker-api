@@ -1,9 +1,8 @@
 package gestion.cosit.gestionDepense.service;
 
-import gestion.cosit.gestionDepense.model.Admin;
-import gestion.cosit.gestionDepense.model.Demande;
-import gestion.cosit.gestionDepense.model.SendNotification;
-import gestion.cosit.gestionDepense.model.Utilisateur;
+import gestion.cosit.gestionDepense.Exception.NoContentException;
+import gestion.cosit.gestionDepense.model.*;
+import gestion.cosit.gestionDepense.repository.DemandeRepository;
 import gestion.cosit.gestionDepense.repository.SendNotifRepository;
 import gestion.cosit.gestionDepense.repository.UtilisateurRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -30,6 +29,8 @@ public class SendNotifService {
     private JavaMailSender javaMailSender;
     @Autowired
     private SendNotifRepository sendNotifRepository;
+    @Autowired
+    private DemandeRepository demandeRepository;
 
     @Value("ibrahim20000sy@gmail.com")
     String sender;
@@ -38,6 +39,7 @@ public class SendNotifService {
         String msg;
         SendNotification sendNotif = new SendNotification();
         Utilisateur utilisateur = demande.getUtilisateur();
+//        Demande demande1 = demande;
         System.out.println("User dans send service"+utilisateur);
         Admin admin = demande.getAdmin();
         System.out.println("Admin dans send "+admin);
@@ -47,6 +49,9 @@ public class SendNotifService {
         msg = "Bonjour Mr "+ admin.getNom().toUpperCase()  + " " + admin.getPrenom().toUpperCase()  + ".\n Vous avez reçus une nouvelle demande de la part de  Mr" + utilisateur.getNom().toUpperCase()  + " "+ utilisateur.getPrenom().toUpperCase() ;
 
         try {
+            // Sauvegarder l'entité Demande d'abord
+            demandeRepository.save(demande);
+
             System.out.println("Debut de l'envoie dans le servive");
             sendNotif.setMessage(msg);
             mailMessage.setFrom(sender);
@@ -63,6 +68,7 @@ public class SendNotifService {
             sendNotif.setUtilisateur(utilisateur);
             sendNotif.setAdmin(admin);
             sendNotif.setDate(dateEnvoie);
+            sendNotif.setDemande(demande);
             System.out.println("Fin de l'envoie dans le servive");
 
             sendNotifRepository.save(sendNotif);
@@ -75,6 +81,7 @@ public class SendNotifService {
         String msg;
         SendNotification sendNotif = new SendNotification();
         Utilisateur utilisateur = demande.getUtilisateur();
+//        Demande demande1 = demande;
         System.out.println("User dans send service"+utilisateur);
         Admin admin = demande.getAdmin();
         System.out.println("Admin dans send "+admin);
@@ -84,6 +91,9 @@ public class SendNotifService {
         msg = "Bonjour Mr "+  utilisateur.getNom().toUpperCase() + " "+ utilisateur.getPrenom().toUpperCase()+ ".\n Votre demande de a été approuver par Mr "+admin.getNom().toUpperCase()  + " " + admin.getPrenom().toUpperCase() ;
 
         try {
+            // Sauvegarder l'entité Demande d'abord
+            demandeRepository.save(demande);
+
             sendNotif.setMessage(msg);
             mailMessage.setFrom(sender);
             mailMessage.setTo(utilisateur.getEmail());
@@ -99,7 +109,7 @@ public class SendNotifService {
             sendNotif.setUtilisateur(utilisateur);
             sendNotif.setAdmin(admin);
             sendNotif.setDate(dateEnvoie);
-
+            sendNotif.setDemande(demande);
             sendNotifRepository.save(sendNotif);
         }catch (Exception e){
             throw new BadRequestException(e.getMessage());
@@ -113,4 +123,14 @@ public class SendNotifService {
 
         return notifListe;
     }
+
+    public String supprimer(long id){
+       SendNotification sendNotification = sendNotifRepository.findByIdNotification(id);
+       if(sendNotification == null)
+           throw  new NoContentException("Aucun notif trouvé");
+       sendNotifRepository.delete(sendNotification);
+        return "supprimer avec succèss";
+    }
+
+
 }

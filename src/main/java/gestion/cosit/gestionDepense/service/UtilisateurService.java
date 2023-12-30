@@ -1,6 +1,8 @@
 package gestion.cosit.gestionDepense.service;
 
 import gestion.cosit.gestionDepense.Exception.NoContentException;
+import gestion.cosit.gestionDepense.model.CategorieDepense;
+import gestion.cosit.gestionDepense.model.SendNotification;
 import gestion.cosit.gestionDepense.model.Utilisateur;
 import gestion.cosit.gestionDepense.repository.UtilisateurRepository;
 import jakarta.persistence.EntityExistsException;
@@ -65,12 +67,17 @@ public class UtilisateurService {
     }
 
     //Méthode de recupperation des users
-    public List<Utilisateur> getAllUtisateur() throws Exception {
-        List<Utilisateur> utilisateurs = utilisateurRepository.findAll();
-        if(utilisateurs.isEmpty()){
-            throw  new Exception("Aucun utilisateur trouvé");
-        }
-        return utilisateurs;
+//    public List<Utilisateur> getAllUser(){
+//        List<Utilisateur>  utilisateurs = utilisateurRepository.findAll();
+//        if(utilisateurs.isEmpty()){
+//            throw new NoContentException("Aucun employé  trouvé");
+//        }
+//
+//        return utilisateurs;
+//    }
+
+    public List<Utilisateur> lire(){
+        return utilisateurRepository.findAll();
     }
 
     //Méthode de recupperation d'un seul user

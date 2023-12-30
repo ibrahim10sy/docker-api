@@ -42,8 +42,9 @@ public class DemandeController {
 
     @PutMapping("/approuveDemandeByAdmin/{id}")
     @Operation(summary = "Autorisation de la demande par l'admin")
-    public ResponseEntity<Demande> approuveDemandesByAdmin(@RequestBody Demande demande, @PathVariable long id) throws BadRequestException {
-        return new ResponseEntity<>(demandeService.approuveByAdmin(demande,id), HttpStatus.OK);
+    public ResponseEntity<Demande> approuveDemandesByAdmin(@RequestBody Demande demande ,@PathVariable long id) throws BadRequestException {
+        Demande demandeApprouvee = demandeService.approuveByAdmin(demande,id);
+        return new ResponseEntity<>(demandeApprouvee, HttpStatus.OK);
     }
 
     @GetMapping("/read/{idUtilisateur}")
@@ -54,22 +55,14 @@ public class DemandeController {
 
     @GetMapping("/list")
     @Operation(summary = "Liste des demande ")
-    public ResponseEntity<List<Demande>> getAllDemandes(){
+    public ResponseEntity<List<Demande>> getDemande(){
         return new ResponseEntity<>(demandeService.getAllDemande(), HttpStatus.OK);
     }
     @DeleteMapping("/delete/{id}")
-    @Operation(summary = "Suppression des demandes")
-    @ResponseStatus(HttpStatus.OK) // Indique le code de statut HTTP pour une suppression réussie
-    public String supprimerDemande(@PathVariable long idDemande) {
-        try {
-            return demandeService.deleteDemande(idDemande);
-        } catch (EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Demande non trouvée avec l'ID spécifié", e);
-        } catch (NoContentException e) {
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT, e.getMessage(), e);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Une erreur interne s'est produite", e);
-        }
+    @Operation(summary = "Suppression d'une demande")
+    public  String delete(@PathVariable long id){
+        return demandeService.deleteDemande(id);
     }
+
 }
 

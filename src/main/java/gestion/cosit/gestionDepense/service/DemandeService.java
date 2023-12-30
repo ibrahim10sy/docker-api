@@ -3,6 +3,7 @@ package gestion.cosit.gestionDepense.service;
 import gestion.cosit.gestionDepense.Exception.NoContentException;
 import gestion.cosit.gestionDepense.model.Admin;
 import gestion.cosit.gestionDepense.model.Demande;
+import gestion.cosit.gestionDepense.model.SendNotification;
 import gestion.cosit.gestionDepense.model.Utilisateur;
 import gestion.cosit.gestionDepense.repository.AdminRepository;
 import gestion.cosit.gestionDepense.repository.DemandeRepository;
@@ -60,8 +61,12 @@ public class DemandeService {
         Demande demandes = demandeRepositroy.findById(id).orElseThrow(()-> new EntityNotFoundException("Demande non trouvé"));
 
         demandes.setMotif(demande.getMotif());
-        demandes.setMontantDemande(demandes.getMontantDemande());
-        demandes.setDateDemande(demande.getDateDemande());
+        demandes.setMontantDemande(demande.getMontantDemande());
+
+        Date dateEnvoie = new Date();
+        Instant instant = dateEnvoie.toInstant();
+        ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+        demandes.setDateDemande(dateEnvoie);
 
         return demandeRepositroy.save(demandes);
     }
@@ -91,21 +96,23 @@ public class DemandeService {
     }
 
     public Demande approuveByAdmin(Demande demande, long id) throws BadRequestException {
-        Admin admin = adminRepository.findByIdAdmin(demande.getAdmin().getIdAdmin());
-        if (admin == null)
-            throw new NoContentException("Admin non trouvé");
+        Demande demandes = demandeRepositroy.findById(id).orElseThrow(()-> new EntityNotFoundException("Demande non trouvé"));
 
-        Demande demandes = demandeRepositroy.findById(id).orElseThrow(() -> new EntityNotFoundException("Demande non trouvé"));
+        demandes.setMotif(demande.getMotif());
+        demandes.setMontantDemande(demande.getMontantDemande());
         demandes.setAutorisationAdmin(true);
+//        demandes.setDateDemande(demandes.getDateDemande());
 
         sendNotifService.sendApprouveDemande(demande);
         return demandeRepositroy.save(demandes);
     }
 
-
     public String deleteDemande(long id){
-        Demande demande = demandeRepositroy.findById(id).orElseThrow(() -> new NoContentException("Demande non trouvé"));
+        Demande demande = demandeRepositroy.findByIdDemande(id);
+        if(demande == null)
+            throw new NoContentException("Acune demande troouvé");
         demandeRepositroy.delete(demande);
         return "Supprimé avec succèss";
     }
+
 }

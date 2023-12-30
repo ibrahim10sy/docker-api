@@ -22,10 +22,10 @@ public class NotifController {
         return new ResponseEntity<>(sendNotifService.getAllNotif(), HttpStatus.OK);
     }
 
-//    @DeleteMapping("/delete/{id}")
-//    @Operation(summary = "Suppression d'une notification")
-//    public  String delete(@PathVariable long id){
-//        return notificationService.deleteNotification(id);
-//    }
+    @DeleteMapping("/delete/{id}")
+    @Operation(summary = "Suppression d'une notification")
+    public  String delete(@PathVariable long id){
+        return sendNotifService.supprimer(id);
+    }
 //    /* @Autowired
 }
