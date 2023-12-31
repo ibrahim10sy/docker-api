@@ -100,7 +100,7 @@ public class UtilisateurService {
         user.setNom(utilisateur.getNom());
         user.setPrenom(utilisateur.getPrenom());
         user.setEmail(utilisateur.getEmail());
-        user.setMotDePasse(utilisateur.getMotDePasse());
+        user.setPassWord(utilisateur.getPassWord());
         user.setPhone(utilisateur.getPhone());
         user.setRole(utilisateur.getRole());
 
@@ -161,8 +161,8 @@ public class UtilisateurService {
         }
         return
     }*/
-    public Utilisateur connection(String email, String motDePasse){
-        Utilisateur user = utilisateurRepository.findByEmailAndMotDePasse(email, motDePasse);
+    public Utilisateur connection(String email, String passWord){
+        Utilisateur user = utilisateurRepository.findByEmailAndPassWord(email, passWord);
         if (user == null) {
             throw new EntityNotFoundException("Ce utilisateur n'existe pas");
         }

@@ -84,7 +84,7 @@ public List<Utilisateur> listUser(){
     @PostMapping("/login")
     @Operation(summary = "Connexion d'un utilisateur")
     public Object connexion(@RequestParam("email") String email,
-                            @RequestParam("motDePasse") String motDePasse) {
-        return utilisateurService.connection(email, motDePasse);
+                            @RequestParam("passWord") String passWord) {
+        return utilisateurService.connection(email, passWord);
     }
 }

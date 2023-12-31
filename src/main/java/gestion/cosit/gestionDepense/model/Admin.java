@@ -10,7 +10,7 @@ import java.util.List;
 
 @Entity
 @Data
-@JsonIgnoreProperties({"budgetList", "demandeList", "categorieList", "depenseList", "sendNotificationList"})
+//@JsonIgnoreProperties({"budgetList", "demandeList", "categorieList", "depenseList", "sendNotificationList"})
 public class Admin {
 
     @Id
@@ -35,28 +35,28 @@ public class Admin {
     @Column(length = 255, nullable = false)
     private String passWord;
 
-    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Budget> budgetList;
 
-    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Demande> demandeList;
 
-    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<CategorieDepense> categorieList;
 
-    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Depense> depenseList;
 
-    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<SendNotification> sendNotificationList;
 
-    @Override
-    public String toString() {
-        return "Admin{idAdmin=" + idAdmin + ", nom='" + nom + "', prenom='" + prenom + " email= '"+ email +"' passWord='" + passWord+ "' phone ='"+ phone +"'}";
-    }
+//    @Override
+//    public String toString() {
+//        return "Admin{idAdmin=" + idAdmin + ", nom='" + nom + "', prenom='" + prenom + " email= '"+ email +"' passWord='" + passWord+ "' phone ='"+ phone +"'}";
+//    }
 }

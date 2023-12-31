@@ -19,10 +19,10 @@ public class Demande {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idDemande;
 
-    @Column(length = 255, nullable = true)
+    @Column(length = 255, nullable = false)
     private String motif;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private int montantDemande;
 
 

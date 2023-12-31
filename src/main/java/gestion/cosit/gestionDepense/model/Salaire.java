@@ -26,7 +26,7 @@ public class Salaire {
     @Column(nullable = false)
     private LocalDate date;
 
-    @ManyToOne()
+    @ManyToOne
     private Utilisateur utilisateur;
 
 }

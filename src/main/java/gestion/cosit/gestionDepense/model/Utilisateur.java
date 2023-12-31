@@ -33,7 +33,7 @@ public class Utilisateur {
     private  String phone;
 
     @Column(length = 255, nullable = false)
-    private  String motDePasse;
+    private  String passWord;
 
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
     @JsonIgnore

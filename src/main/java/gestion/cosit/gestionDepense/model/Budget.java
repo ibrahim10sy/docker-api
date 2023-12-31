@@ -39,20 +39,19 @@ public class Budget {
     private Date dateFin;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
+    @ManyToOne
     private Admin admin;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Utilisateur utilisateur;
 
-    @OneToMany(mappedBy = "budget", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "budget", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Depense> depenseList;
 
     // Mise à jour de la méthode toString()
-    @Override
-    public String toString() {
-        return "Budget{idBudget=" + idBudget + ", description='" + description + "', montant=" + montant + ", montantRestant=" + montantRestant + ", dateDebut=" + dateDebut + ", dateFin=" + dateFin + "}";
-    }
+//    @Override
+//    public String toString() {
+//        return "Budget{idBudget=" + idBudget + ", description='" + description + "', montant=" + montant + ", montantRestant=" + montantRestant + ", dateDebut=" + dateDebut + ", dateFin=" + dateFin + "}";
+//    }
 }
