@@ -109,12 +109,12 @@ public class DepenseController {
     public ResponseEntity<List<Depense>> getAllDepenseByDemande(@PathVariable long idDemande){
         return  new ResponseEntity<>(depenseService.allDepenseByIdDemande(idDemande), HttpStatus.OK);
     }
-
-    @GetMapping("/listDepenseByUser/{idUtilisateur}")
-    @Operation(summary = "Affichage  des dépenses  en fonction de user")
-    public ResponseEntity<List<Depense>> getAllDepenseByUser(@PathVariable long idUitlisateur){
-        return  new ResponseEntity<>(depenseService.allDepenseByIdUtilisateur(idUitlisateur), HttpStatus.OK);
+    @GetMapping("/listByUser/{idUtilisateur}")
+    @Operation(summary = "Affichage  des dépenses par en fonction de user")
+    public ResponseEntity<List<Depense>> getAllDepenseByUser(@PathVariable long idUtilisateur){
+        return  new ResponseEntity<>(depenseService.allDepenseByIdUser(idUtilisateur), HttpStatus.OK);
     }
+
     @GetMapping("/listDepenseByAdmin/{idAdmin}")
     @Operation(summary = "Affichage  des dépenses par en fonction de user")
     public ResponseEntity<List<Depense>> getAllDepenseByAdmin(@PathVariable long idAdmin){
@@ -132,16 +132,3 @@ public class DepenseController {
         return depenseService.deleteDepende(id);
     }
 }
-
-
-//    @PostMapping("/create")
-//    @Operation(summary = "création de dépense")
-//    public ResponseEntity<Depense> createDepense(@Valid @RequestBody Depense depense) throws BadRequestException {
-//        return new ResponseEntity<>(depenseService.saveDepense(depense), HttpStatus.CREATED);
-//    }
-//
-//    @PutMapping("/update/{id}")
-//    @Operation(summary = "Modification d'un dépense")
-//    public ResponseEntity<Depense> updateDepenses(@Valid @RequestBody Depense depense, @PathVariable long id){
-//        return new ResponseEntity<>(depenseService.updateDepense(depense,id) , HttpStatus.OK);
-//    }

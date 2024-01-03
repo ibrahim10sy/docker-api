@@ -22,6 +22,10 @@ public class NotifController {
         return new ResponseEntity<>(sendNotifService.getAllNotif(), HttpStatus.OK);
     }
 
+    @GetMapping("/read/{id}")
+    public ResponseEntity<List<SendNotification>> listNotifByUser(@PathVariable long id){
+        return new ResponseEntity<>(sendNotifService.getAllNotifByUser(id), HttpStatus.OK);
+    }
     @DeleteMapping("/delete/{id}")
     @Operation(summary = "Suppression d'une notification")
     public  String delete(@PathVariable long id){

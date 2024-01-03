@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -55,7 +56,11 @@ public class AdminController {
     public ResponseEntity<Admin> getAdminById(@Valid @PathVariable long id){
         return new ResponseEntity<>(adminService.getAdminById(id), HttpStatus.OK);
     }
-
+    @GetMapping("/list")
+    @Operation(summary = "Affichage des admin")
+    public ResponseEntity<List<Admin>> getAdminById(){
+        return new ResponseEntity<>(adminService.getAllAdmin(), HttpStatus.OK);
+    }
     @DeleteMapping("/delete")
     @Operation(summary = "Suppression d'un admin")
     public ResponseEntity<String> deleteAdmin(@PathVariable long id){

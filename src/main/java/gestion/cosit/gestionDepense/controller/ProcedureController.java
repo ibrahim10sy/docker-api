@@ -23,4 +23,10 @@ public class ProcedureController {
     public List<Map<String, Object>> getTotalExpensesByCategoryByAdmin(@PathVariable Long adminId) {
         return procedureService.getTotalDepenseByAdmin(adminId);
     }
+
+    @GetMapping("/expensesByUser/{userId}")
+    @Operation(summary = "Donner la statistique des depenses par categorie")
+    public List<Map<String, Object>> getTotalExpensesByCategoryByUser(@PathVariable Long userId) {
+        return procedureService.getTotalDepenseByUser(userId);
+    }
 }

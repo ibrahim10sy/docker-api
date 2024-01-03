@@ -303,18 +303,19 @@ public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) 
             throw  new EntityNotFoundException("Aucun dépense trouvé");
         return DepenseList;
     }
-    public List<Depense> allDepenseByIdUtilisateur(long idUtilisateur){
+
+    public List<Depense> allDepenseByIdUser(long idUtilisateur){
         List<Depense> depenseList = depenseRepository.findByUtilisateurIdUtilisateur(idUtilisateur);
 
         if(depenseList.isEmpty())
-            throw new EntityNotFoundException("Aucun depense trouvé en fonction de la demande");
+            throw new EntityNotFoundException("Aucun depense trouvé en fonction de la ");
         return depenseList;
     }
     public List<Depense> allDepenseByIdAdmin(long idAdmin){
         List<Depense> depenseList = depenseRepository.findByAdminIdAdmin(idAdmin);
 
         if(depenseList.isEmpty())
-            throw new EntityNotFoundException("Aucun depense trouvé en fonction de la demande");
+            throw new EntityNotFoundException("Aucun depense trouvé ");
         return depenseList;
     }
     public List<Depense> getDepenseByIdBudget(long idBudget){

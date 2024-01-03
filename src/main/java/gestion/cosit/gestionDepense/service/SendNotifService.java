@@ -107,6 +107,15 @@ public class SendNotifService {
             throw new Exception("Erreur lors de l'envoi de notification par e-mail : " + e.getMessage());
         }
     }
+
+    public List<SendNotification> getAllNotifByUser(long id){
+        List<SendNotification>  notifListe = sendNotifRepository.findByUtilisateurIdUtilisateur(id);
+        if(notifListe.isEmpty()){
+            throw new EntityNotFoundException("Aucune notifiaction  trouvé");
+        }
+
+        return notifListe;
+    }
     public List<SendNotification> getAllNotif(){
         List<SendNotification>  notifListe = sendNotifRepository.findAll();
         if(notifListe.isEmpty()){
