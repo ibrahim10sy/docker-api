@@ -22,4 +22,9 @@ public class ProcedureService {
         String query = "CALL GetDpenseByIdUser(?)";
         return jdbcTemplate.queryForList(query,userId);
     }
+
+    public List<Map<String, Object>> getTotalDepense(){
+        String query = "CALL GetDepenseTotal()";
+        return jdbcTemplate.queryForList(query);
+    }
 }
