@@ -110,11 +110,11 @@ public class DepenseController {
     public List<Depense> readByBudget(@PathVariable long idBudget){
         return depenseService.getDepenseByIdBudget(idBudget);
     }
-    @GetMapping("/listDemandeByUser/{idDemande}")
-    @Operation(summary = "Affichage  des dépenses  en fonction du  demande")
-    public ResponseEntity<List<Depense>> getAllDepenseByDemande(@PathVariable long idDemande){
-        return  new ResponseEntity<>(depenseService.allDepenseByIdDemande(idDemande), HttpStatus.OK);
-    }
+//    @GetMapping("/listDemandeByUser/{idDemande}")
+//    @Operation(summary = "Affichage  des dépenses  en fonction du  demande")
+//    public ResponseEntity<List<Depense>> getAllDepenseByDemande(@PathVariable long idDemande){
+//        return  new ResponseEntity<>(depenseService.allDepenseByIdDemande(idDemande), HttpStatus.OK);
+//    }
     @GetMapping("/listByUser/{idUtilisateur}")
     @Operation(summary = "Affichage  des dépenses par en fonction de user")
     public ResponseEntity<List<Depense>> getAllDepenseByUser(@PathVariable long idUtilisateur){

@@ -3,6 +3,7 @@ package gestion.cosit.gestionDepense.service;
 import gestion.cosit.gestionDepense.Exception.NoContentException;
 import gestion.cosit.gestionDepense.model.*;
 import gestion.cosit.gestionDepense.repository.DemandeRepository;
+import gestion.cosit.gestionDepense.repository.DepenseRepository;
 import gestion.cosit.gestionDepense.repository.SendNotifRepository;
 import gestion.cosit.gestionDepense.repository.UtilisateurRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -30,18 +31,18 @@ public class SendNotifService {
     @Autowired
     private SendNotifRepository sendNotifRepository;
     @Autowired
-    private DemandeRepository demandeRepository;
+    private DepenseRepository depenseRepository;
 
     @Value("ibrahim20000sy@gmail.com")
     String sender;
 
-    public void sendDemande(Demande demande) throws BadRequestException {
+    public void sendDemande(Depense depense) throws BadRequestException {
         String msg;
         SendNotification sendNotif = new SendNotification();
-        Utilisateur utilisateur = demande.getUtilisateur();
-//        Demande demande1 = demande;
+        Utilisateur utilisateur = depense.getUtilisateur();
+        Budget budget = depense.getBudget();
         System.out.println("User dans send service"+utilisateur);
-        Admin admin = demande.getAdmin();
+        Admin admin = budget.getAdmin();
         System.out.println("Admin dans send "+admin);
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
@@ -50,7 +51,7 @@ public class SendNotifService {
 
         try {
             // Sauvegarder l'entité Demande d'abord
-            demandeRepository.save(demande);
+            depenseRepository.save(depense);
 
             System.out.println("Debut de l'envoie dans le servive");
             sendNotif.setMessage(msg);
@@ -64,11 +65,11 @@ public class SendNotifService {
             Date dateEnvoie = new Date();
             Instant instant = dateEnvoie.toInstant();
             ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
-            demande.setDateDemande(dateEnvoie);
+//            demande.setDateDemande(dateEnvoie);
             sendNotif.setUtilisateur(utilisateur);
             sendNotif.setAdmin(admin);
             sendNotif.setDate(dateEnvoie);
-            sendNotif.setDemande(demande);
+            sendNotif.setDepense(depense);
             System.out.println("Fin de l'envoie dans le servive");
 
             sendNotifRepository.save(sendNotif);
@@ -77,36 +78,36 @@ public class SendNotifService {
         }
     }
 
-    public void sendNotificationForApproval(Demande demande) throws Exception {
-        try {
-            // Créer le message de notification
-            String msg = "Bonjour Mr " + demande.getUtilisateur().getNom().toUpperCase() + " " +
-                    demande.getUtilisateur().getPrenom().toUpperCase() +
-                    ".\n Votre demande a été approuvée par Mr " + demande.getAdmin().getNom().toUpperCase() +
-                    " " + demande.getAdmin().getPrenom().toUpperCase();
-
-            // Configurer l'email
-            SimpleMailMessage mailMessage = new SimpleMailMessage();
-            mailMessage.setFrom(sender);
-            mailMessage.setTo(demande.getUtilisateur().getEmail());
-            mailMessage.setText(msg);
-            mailMessage.setSubject("Alerte demande ");
-
-            // Envoyer l'email
-            javaMailSender.send(mailMessage);
-
-            // Sauvegarder la notification
-            SendNotification sendNotif = new SendNotification();
-            sendNotif.setMessage(msg);
-            sendNotif.setUtilisateur(demande.getUtilisateur());
-            sendNotif.setAdmin(demande.getAdmin());
-            sendNotif.setDate(new Date());
-            sendNotif.setDemande(demande);
-            sendNotifRepository.save(sendNotif);
-        } catch (Exception e) {
-            throw new Exception("Erreur lors de l'envoi de notification par e-mail : " + e.getMessage());
-        }
-    }
+//    public void sendNotificationForApproval(Demande demande) throws Exception {
+//        try {
+//            // Créer le message de notification
+//            String msg = "Bonjour Mr " + demande.getUtilisateur().getNom().toUpperCase() + " " +
+//                    demande.getUtilisateur().getPrenom().toUpperCase() +
+//                    ".\n Votre demande a été approuvée par Mr " + demande.getAdmin().getNom().toUpperCase() +
+//                    " " + demande.getAdmin().getPrenom().toUpperCase();
+//
+//            // Configurer l'email
+//            SimpleMailMessage mailMessage = new SimpleMailMessage();
+//            mailMessage.setFrom(sender);
+//            mailMessage.setTo(demande.getUtilisateur().getEmail());
+//            mailMessage.setText(msg);
+//            mailMessage.setSubject("Alerte demande ");
+//
+//            // Envoyer l'email
+//            javaMailSender.send(mailMessage);
+//
+//            // Sauvegarder la notification
+//            SendNotification sendNotif = new SendNotification();
+//            sendNotif.setMessage(msg);
+//            sendNotif.setUtilisateur(demande.getUtilisateur());
+//            sendNotif.setAdmin(demande.getAdmin());
+//            sendNotif.setDate(new Date());
+//            sendNotif.setDemande(demande);
+//            sendNotifRepository.save(sendNotif);
+//        } catch (Exception e) {
+//            throw new Exception("Erreur lors de l'envoi de notification par e-mail : " + e.getMessage());
+//        }
+//    }
 
     public List<SendNotification> getAllNotifByUser(long id){
         List<SendNotification>  notifListe = sendNotifRepository.findByUtilisateurIdUtilisateur(id);

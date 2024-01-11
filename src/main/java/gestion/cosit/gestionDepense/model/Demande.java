@@ -42,12 +42,12 @@ public class Demande {
     @ManyToOne
     private Utilisateur utilisateur;
 
-    @OneToOne
-    @JsonIgnore
-    private  Depense depense;
+//    @OneToOne
+//    @JsonIgnore
+//    private  Depense depense;
 
-    @OneToMany(mappedBy = "demande", orphanRemoval = true)
-    @JsonIgnore
-    private List<SendNotification> notifications;
+//    @OneToMany(mappedBy = "demande", orphanRemoval = true)
+//    @JsonIgnore
+//    private List<SendNotification> notifications;
 
 }

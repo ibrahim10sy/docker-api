@@ -22,11 +22,11 @@ public class DemandeController {
     @Autowired
     private DemandeService demandeService;
 
-    @PostMapping("/create")
-    @Operation(summary = "Création de la demande")
-    public ResponseEntity<Demande> createDemande(@RequestBody Demande demande){
-        return new ResponseEntity<>(demandeService.saveDemande(demande), HttpStatus.CREATED);
-    }
+//    @PostMapping("/create")
+//    @Operation(summary = "Création de la demande")
+//    public ResponseEntity<Demande> createDemande(@RequestBody Demande demande){
+//        return new ResponseEntity<>(demandeService.saveDemande(demande), HttpStatus.CREATED);
+//    }
 
     @PutMapping("/update/{id}")
     @Operation(summary = "Mis à jours de la demande")
@@ -40,12 +40,12 @@ public class DemandeController {
         return new ResponseEntity<>(demandeService.approuveByDirecteur(demande,id), HttpStatus.OK);
     }
 
-    @PutMapping("/approuveDemandeByAdmin/{id}")
-    @Operation(summary = "Autorisation de la demande par l'admin")
-    public ResponseEntity<Demande> approuveDemandesByAdmin(@RequestBody Demande demande ,@PathVariable long id) throws Exception {
-        Demande demandeApprouvee = demandeService.approuveByAdmin(demande,id);
-        return new ResponseEntity<>(demandeApprouvee, HttpStatus.OK);
-    }
+//    @PutMapping("/approuveDemandeByAdmin/{id}")
+//    @Operation(summary = "Autorisation de la demande par l'admin")
+//    public ResponseEntity<Demande> approuveDemandesByAdmin(@RequestBody Demande demande ,@PathVariable long id) throws Exception {
+//        Demande demandeApprouvee = demandeService.approuveByAdmin(demande,id);
+//        return new ResponseEntity<>(demandeApprouvee, HttpStatus.OK);
+//    }
 
     @GetMapping("/read/{idUtilisateur}")
     @Operation(summary = "Liste des demande ")

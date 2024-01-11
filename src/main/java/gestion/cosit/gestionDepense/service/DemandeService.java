@@ -33,29 +33,29 @@ public class DemandeService {
     @Autowired
     private SendNotifService sendNotifService;
 
-    public Demande saveDemande(Demande demande){
-        Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(demande.getUtilisateur().getIdUtilisateur());
-        if(utilisateur == null)
-            throw new NoContentException("utilisateur non trouvé");
-       Admin admin = adminRepository.findByIdAdmin(demande.getAdmin().getIdAdmin());
-       if(admin==null)
-           throw new NoContentException("Admin non trouvé");
-
-       Date dateEnvoie = new Date();
-       Instant instant = dateEnvoie.toInstant();
-       ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
-       demande.setDateDemande(dateEnvoie);
-
-        try {
-            System.out.println("Debut de l'envoie dans le servive demande");
-            sendNotifService.sendDemande(demande);
-        } catch (BadRequestException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println("Fin de l'envoie dans le servive demande");
-
-        return demandeRepositroy.save(demande);
-    }
+//    public Demande saveDemande(Demande demande){
+//        Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(demande.getUtilisateur().getIdUtilisateur());
+//        if(utilisateur == null)
+//            throw new NoContentException("utilisateur non trouvé");
+//       Admin admin = adminRepository.findByIdAdmin(demande.getAdmin().getIdAdmin());
+//       if(admin==null)
+//           throw new NoContentException("Admin non trouvé");
+//
+//       Date dateEnvoie = new Date();
+//       Instant instant = dateEnvoie.toInstant();
+//       ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+//       demande.setDateDemande(dateEnvoie);
+//
+//        try {
+//            System.out.println("Debut de l'envoie dans le servive demande");
+//            sendNotifService.sendDemande(demande);
+//        } catch (BadRequestException e) {
+//            throw new RuntimeException(e);
+//        }
+//        System.out.println("Fin de l'envoie dans le servive demande");
+//
+//        return demandeRepositroy.save(demande);
+//    }
 
     public Demande updateDemande(Demande demande, long id){
         Demande demandes = demandeRepositroy.findById(id).orElseThrow(()-> new EntityNotFoundException("Demande non trouvé"));
@@ -109,21 +109,21 @@ public class DemandeService {
 //        return demandeRepositroy.save(demandes);
 //
 //    }
-public Demande approuveByAdmin(Demande demande, long id) throws Exception {
-    Demande demandes = demandeRepositroy.findById(id).orElseThrow(() -> new EntityNotFoundException("Demande non trouvée"));
-
-    demandes.setAutorisationAdmin(true);
-    try {
-        // Approuver la demande en sauvegardant les modifications
-        demandeRepositroy.save(demandes);
-
-        // Envoyer la notification par e-mail
-        sendNotifService.sendNotificationForApproval(demandes);
-    } catch (Exception e) {
-        throw new Exception("Erreur lors de l'approbation de la demande : " + e.getMessage());
-    }
-    return demandes;
-}
+//public Demande approuveByAdmin(Demande demande, long id) throws Exception {
+//    Demande demandes = demandeRepositroy.findById(id).orElseThrow(() -> new EntityNotFoundException("Demande non trouvée"));
+//
+//    demandes.setAutorisationAdmin(true);
+//    try {
+//        // Approuver la demande en sauvegardant les modifications
+//        demandeRepositroy.save(demandes);
+//
+//        // Envoyer la notification par e-mail
+//        sendNotifService.sendNotificationForApproval(demandes);
+//    } catch (Exception e) {
+//        throw new Exception("Erreur lors de l'approbation de la demande : " + e.getMessage());
+//    }
+//    return demandes;
+//}
     public String deleteDemande(long id){
         Demande demande = demandeRepositroy.findByIdDemande(id);
         if(demande == null)

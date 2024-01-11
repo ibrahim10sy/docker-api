@@ -1,12 +1,14 @@
 package gestion.cosit.gestionDepense.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Entity
@@ -48,8 +50,8 @@ public class Depense {
     @JoinColumn(name = "admin_id")
     private Admin admin;
 
-    @OneToOne(mappedBy = "depense", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Demande demande;
+//    @OneToOne(mappedBy = "depense", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private Demande demande;
 
     @ManyToOne
     private SousCategorie sousCategorie;
@@ -59,4 +61,11 @@ public class Depense {
 
     @ManyToOne
     private Budget budget;
+
+    @ManyToOne
+    private ParametreDepense parametreDepense;
+
+    @OneToMany(mappedBy = "depense", orphanRemoval = true)
+    @JsonIgnore
+    private List<SendNotification> notifications;
 }

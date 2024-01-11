@@ -35,6 +35,6 @@ public class SendNotification {
     private Admin admin;
 
     @ManyToOne
-    @JoinColumn(name="idDemande")
-    private Demande demande;
+    @JoinColumn(name="idDepense")
+    private Depense depense;
 }

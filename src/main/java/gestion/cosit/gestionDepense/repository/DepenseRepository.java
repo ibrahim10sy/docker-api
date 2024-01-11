@@ -17,7 +17,7 @@ public interface DepenseRepository extends JpaRepository<Depense,Long> {
     Depense findByUtilisateurAndDateDepense(Utilisateur utilisateur, LocalDate localDate);
 
     Depense findBySousCategorie(SousCategorie sousCategorie);
-    List<Depense> findAllDepenseByDemande_IdDemande(long idDemande);
+//    List<Depense> findAllDepenseByDemande_IdDemande(long idDemande);
     List<Depense> findByUtilisateurIdUtilisateur(long idUtilisateur);
     List<Depense> findByAdminIdAdmin(long idAdmin);
 
