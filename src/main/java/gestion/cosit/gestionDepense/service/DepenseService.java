@@ -100,7 +100,7 @@ public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) 
 
     }
     if (depense.getMontantDepense() >= depense.getParametreDepense().getMontantSeuil()) {
-        // Dépense avec un montant supérieur ou égal au seuil, envoie de notification
+        // Montant supérieur ou égal au seuil, envoie de notification
         try {
             System.out.println("Debut de l'envoi dans le service demande");
             sendNotifService.sendDemande(depense);
@@ -111,19 +111,26 @@ public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) 
 
         // Ne pas ajouter la dépense immédiatement, attendre la validation de l'administrateur
         depense.setAutorisationAdmin(false);
+
+        // Enregistrement initial avec la dépense non validée
+        depense = depenseRepository.save(depense);
     } else {
         // Montant inférieur au seuil, la dépense peut être enregistrée directement
         // Mettre à jour le montant restant du budget
         budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
         depense.setViewed(false);
-        budgetRepository.save(budget);
 
-        // dépense comme validée car elle n'a pas besoin de validation administrative
+        // Marquer la dépense comme validée car elle n'a pas besoin de validation administrative
         depense.setAutorisationAdmin(true);
+
+        // Enregistrer la dépense mise à jour
+        depense = depenseRepository.save(depense);
     }
 
-    // Enregistrer la dépense mise à jour
-    return depenseRepository.save(depense);
+    // Mettre à jour le montant restant du budget
+    budgetRepository.save(budget);
+
+    return depense;
 }
     // Méthode permettant de  valider la dépense par l'administrateur
     public Depense validateDepenseByAdmin(Long depenseId) throws Exception {
