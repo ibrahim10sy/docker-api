@@ -18,9 +18,7 @@ public class CategorieDepense {
     @Column(length = 255, nullable = false)
     private String libelle;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "categorieDepense",cascade = CascadeType.ALL)
-    private List<Depense> depenseList;
+
 
     @JsonIgnore
     @OneToMany(mappedBy = "categorieDepense", cascade = CascadeType.ALL)

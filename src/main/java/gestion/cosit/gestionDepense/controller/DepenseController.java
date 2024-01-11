@@ -77,6 +77,12 @@ public class DepenseController {
         return new ResponseEntity<>(updateDepenses, HttpStatus.CREATED);
     }
 
+    @PutMapping("marquer/{id}")
+    @Operation(summary = "marquer comme view")
+    public ResponseEntity<Depense> marquer(@PathVariable long id){
+        return  new ResponseEntity<>(depenseService.marquerView(id),HttpStatus.OK);
+    }
+
     @GetMapping("/search")
     @Operation(summary = "Rechercher un budget par sa description")
     public ResponseEntity<List<Depense>> searchByDesc(@RequestParam("desc") String desc){
@@ -122,7 +128,7 @@ public class DepenseController {
     }
     @GetMapping("/read")
     @Operation(summary = "Affichage  des dépenses par en fonction des  demande")
-    public ResponseEntity<List<Depense>> getAllDepenseByDemande(){
+    public ResponseEntity<List<Depense>> getAllDepenseByDepense(){
         return  new ResponseEntity<>(depenseService.allDepense(), HttpStatus.OK);
     }
 

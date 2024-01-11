@@ -47,6 +47,13 @@ public List<SousCategorie> getAllSousCategorie(long idCategoriedepense){
             throw new NoContentException("Aucune sous categorie trouvé");
         return sousCategorieList;
 }
+
+    public List<SousCategorie> getAllSousCat(){
+        List<SousCategorie> sousCategorieList = sousCategorieRepository.findAll();
+        if(sousCategorieList.isEmpty())
+            throw new NoContentException("Aucune sous categorie trouvé");
+        return sousCategorieList;
+    }
     public String supprimer(long idSousCategorie){
         SousCategorie sousCategorie = sousCategorieRepository.findByIdSousCategorie(idSousCategorie);
         if (sousCategorie == null)

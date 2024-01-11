@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BudgetService {
@@ -96,9 +97,9 @@ public class BudgetService {
         existingBudget.setMontant(budget.getMontant());
         existingBudget.setDateDebut(budget.getDateDebut());
         // Calcul du montant restant
-        int restant =existingBudget.getMontantRestant();
-        restant += (budget.getMontant() - existingBudget.getMontant());
-        existingBudget.setMontantRestant(restant);
+//        int restant = budget.getMontant() - (existingBudget.getMontant( ) - existingBudget.getMontantRestant());
+        existingBudget.setMontantRestant(existingBudget.getMontant());
+
         // Obtention de la date de début en type Date
         Date dateDebut = budget.getDateDebut();
 
@@ -115,6 +116,7 @@ public class BudgetService {
 
 // Mise à jour de l'objet Budget
         existingBudget.setDateFin(dateFin);
+
         return budgetRepository.save(existingBudget);
     }
 
@@ -125,6 +127,10 @@ public class BudgetService {
         if (budgetList.isEmpty())
             throw new NoContentException("Aucun budget trouvÃ©");
 
+        budgetList = budgetList
+                .stream().sorted((d1, d2) -> d2.getDescription()
+                        .compareTo(d1.getDescription()))
+                .collect(Collectors.toList());
         // Dans le cas contraire le systÃ¨me retourne la liste
         return budgetList;
     }
@@ -134,7 +140,9 @@ public class BudgetService {
         if(budgetListe.isEmpty()){
             throw new EntityNotFoundException("Aucun budget trouvé pour ce utilisateur");
         }
-
+        budgetListe = budgetListe
+                .stream().sorted((d1, d2) -> d2.getDescription().compareTo(d1.getDescription()))
+                .collect(Collectors.toList());
         return budgetListe;
     }
 
@@ -145,6 +153,9 @@ public class BudgetService {
             throw new EntityNotFoundException("Aucun budget trouvé pour ce utilisateur");
         }
 
+        budgetListe = budgetListe
+                .stream().sorted((d1, d2) -> d2.getDescription().compareTo(d1.getDescription()))
+                .collect(Collectors.toList());
         return budgetListe;
     }
     public List<Budget> allBudgetByUser(long idUtilisateur){
@@ -154,6 +165,9 @@ public class BudgetService {
         if (budgetList.isEmpty())
             throw new NoContentException("Aucun budget trouvÃ©");
 
+        budgetList = budgetList
+                .stream().sorted((d1, d2) -> d2.getDescription().compareTo(d1.getDescription()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ))
+                .collect(Collectors.toList());
         // Dans le cas contraire le systÃ¨me retourne la liste
         return budgetList;
     }

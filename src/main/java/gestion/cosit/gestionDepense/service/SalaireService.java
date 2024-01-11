@@ -2,8 +2,10 @@ package gestion.cosit.gestionDepense.service;
 
 import gestion.cosit.gestionDepense.Exception.NoContentException;
 import gestion.cosit.gestionDepense.model.Salaire;
+import gestion.cosit.gestionDepense.model.SousCategorie;
 import gestion.cosit.gestionDepense.model.Utilisateur;
 import gestion.cosit.gestionDepense.repository.SalaireRepository;
+import gestion.cosit.gestionDepense.repository.SousCategorieRepository;
 import gestion.cosit.gestionDepense.repository.UtilisateurRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SalaireService {
@@ -22,9 +25,14 @@ public class SalaireService {
     private SalaireRepository salaireRepository;
     @Autowired
     private UtilisateurRepository utilisateurRepository;
+    @Autowired
+    private SousCategorieRepository sousCategorieRepository;
     public Salaire saveSalaire(Salaire salaire) {
         Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(salaire.getUtilisateur().getIdUtilisateur());
+        SousCategorie sousCategorie = sousCategorieRepository.findByIdSousCategorie(salaire.getSousCategorie().getIdSousCategorie());
 
+        if(sousCategorie == null )
+            throw new NoContentException("Sous catégorie non trouvé");
         if (utilisateur == null) {
             throw new NoContentException("Utilisateur non trouvé");
         }
@@ -66,6 +74,10 @@ public class SalaireService {
         List<Salaire> salaireList = salaireRepository.findAll();
         if(salaireList.isEmpty())
             throw new NoContentException("Aucun salaire trouvé");
+
+        salaireList = salaireList
+                .stream().sorted((d1, d2) -> d2.getDescription().compareTo(d1.getDescription()))
+                .collect(Collectors.toList());
         return salaireList;
     }
 
@@ -73,6 +85,11 @@ public class SalaireService {
         List<Salaire> salaireList = salaireRepository.findByUtilisateur_IdUtilisateur(idUtilisateur);
         if(salaireList.isEmpty())
             throw new NoContentException("Aucun salaire trouvé");
+
+        salaireList = salaireList
+                .stream().sorted((d1, d2) -> d2.getDate().compareTo(d1.getDate()))
+                .collect(Collectors.toList());
+
         return salaireList;
     }
 

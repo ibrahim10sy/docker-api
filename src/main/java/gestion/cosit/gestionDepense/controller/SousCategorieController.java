@@ -40,6 +40,11 @@ public class SousCategorieController {
         return new ResponseEntity<>(sousCategorieService.getAllSousCategorie(idCategoriedepense), HttpStatus.OK);
     }
 
+    @GetMapping("/liste")
+    @Operation(summary = "liste des sous categories en fonction")
+    public ResponseEntity<List<SousCategorie>> getAllSousCategore(){
+        return new ResponseEntity<>(sousCategorieService.getAllSousCat(), HttpStatus.OK);
+    }
     @DeleteMapping("/SupprimerSousCategorie/{idSousCategorie}")
     @Operation(summary = "suppression d'une sous catégorie")
     @ResponseStatus(HttpStatus.OK)

@@ -91,9 +91,6 @@ public class CategorieService {
         CategorieDepense categorieDepense = categorieRepository.findByIdCategoriedepense(id);
        if (categorieDepense == null)
             throw new NoContentException("Cette categorie n'existe pas");
-        Depense depense = depenseRepository.findByCategorieDepense(categorieDepense);
-        if(depense != null)
-            throw new NoContentException("On peut pas supprimer une categorie qui est déjà associer à une depense");
 
         categorieRepository.delete(categorieDepense);
         return "Catégorie supprimé avec succèss";

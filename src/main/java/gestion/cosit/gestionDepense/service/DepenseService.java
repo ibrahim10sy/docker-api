@@ -16,6 +16,7 @@ import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DepenseService {
@@ -32,6 +33,8 @@ public class DepenseService {
         BudgetRepository budgetRepository;
         @Autowired
         AdminRepository adminRepository;
+        @Autowired
+        SousCategorieRepository sousCategorieRepository;
 
 //    public Depense saveDepenseByUser(Depense depense) throws BadRequestException {
 //
@@ -69,13 +72,13 @@ public class DepenseService {
 //    }
 public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) throws Exception {
     Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(depense.getUtilisateur().getIdUtilisateur());
-    CategorieDepense categorieDepense = categorieRepository.findByIdCategoriedepense(depense.getCategorieDepense().getIdCategoriedepense());
+    SousCategorie sousCategorie = sousCategorieRepository.findByIdSousCategorie(depense.getSousCategorie().getIdSousCategorie());
     Budget budget = budgetRepository.findByIdBudget(depense.getBudget().getIdBudget());
 
     if(budget == null)
         throw new BadRequestException("Desolé ce budget n'existe pas");
 
-    if(categorieDepense == null)
+    if(sousCategorie == null)
         throw new BadRequestException("Desolé cette catégorie n'existe pas");
 
     if (utilisateur == null)
@@ -135,6 +138,7 @@ public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) 
     // Mettre à jour le montant restant du budget
     budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
     System.out.println(depense);
+    depense.setViewed(false);
     budgetRepository.save(budget);
 
     // Enregistrer la dépense mise à jour
@@ -142,13 +146,13 @@ public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) 
 }
     public Depense saveDepenseByAdmin(Depense depense , MultipartFile multipartFile) throws Exception {
         Admin admin = adminRepository.findByIdAdmin(depense.getAdmin().getIdAdmin());
-        CategorieDepense categorieDepense = categorieRepository.findByIdCategoriedepense(depense.getCategorieDepense().getIdCategoriedepense());
         Budget budget = budgetRepository.findByIdBudget(depense.getBudget().getIdBudget());
+        SousCategorie sousCategorie = sousCategorieRepository.findByIdSousCategorie(depense.getSousCategorie().getIdSousCategorie());
 
         if(budget == null)
             throw new BadRequestException("Desolé ce budget n'existe pas");
 
-        if(categorieDepense == null)
+        if(sousCategorie == null)
             throw new BadRequestException("Desolé cette catégorie n'existe pas");
 
         if (admin == null)
@@ -197,11 +201,18 @@ public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) 
 
         // Mettre à jour le montant restant du budget
         budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
+        depense.setViewed(false);
         System.out.println(depense);
         budgetRepository.save(budget);
 
         // Enregistrer la dépense mise à jour
         return depenseRepository.save(depense);
+    }
+
+    public Depense marquerView(long id){
+        Depense isDepenseExist = depenseRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Depense non trouvé"));
+        isDepenseExist.setViewed(true);
+        return depenseRepository.save(isDepenseExist);
     }
     public Depense updateDepense(Depense depense, long id, MultipartFile multipartFile) throws Exception {
         Depense isDepenseExist = depenseRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Depense non trouvé"));
@@ -296,12 +307,19 @@ public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) 
         // Dans le cas contraire le systÃ¨me retourne la liste
         return depenseList;
     }
-    public List<Depense> allDepense(){
-        List<Depense> DepenseList = depenseRepository.findAll();
+    public List<Depense> allDepense() {
+        List<Depense> depenseList = depenseRepository.findAll();
 
-        if(DepenseList.isEmpty())
-            throw  new EntityNotFoundException("Aucun dépense trouvé");
-        return DepenseList;
+        if (depenseList.isEmpty())
+            throw new EntityNotFoundException("Aucune dépense trouvée");
+
+
+        // Tri des dépenses par date de dépense, de la plus récente à la plus ancienne
+        depenseList = depenseList
+                .stream().sorted((d1, d2) -> d2.getDescription().compareTo(d1.getDescription()))
+                .collect(Collectors.toList());
+
+        return depenseList;
     }
 
     public List<Depense> allDepenseByIdUser(long idUtilisateur){
@@ -309,6 +327,11 @@ public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) 
 
         if(depenseList.isEmpty())
             throw new EntityNotFoundException("Aucun depense trouvé en fonction de la ");
+
+        depenseList = depenseList
+                .stream().sorted((d1, d2) -> d2.getDescription().compareTo(d1.getDescription()))
+                .collect(Collectors.toList());
+
         return depenseList;
     }
     public List<Depense> allDepenseByIdAdmin(long idAdmin){
@@ -316,11 +339,18 @@ public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) 
 
         if(depenseList.isEmpty())
             throw new EntityNotFoundException("Aucun depense trouvé ");
+
+        depenseList = depenseList
+                .stream().sorted((d1, d2) -> d2.getDescription().compareTo(d1.getDescription()))
+                .collect(Collectors.toList());
         return depenseList;
     }
     public List<Depense> getDepenseByIdBudget(long idBudget){
         List<Depense> depensesList = depenseRepository.findByBudgetIdBudget(idBudget);
 
+        depensesList = depensesList
+                .stream().sorted((d1, d2) -> d2.getDescription().compareTo(d1.getDescription()))
+                .collect(Collectors.toList());
         return depensesList;
 
     }

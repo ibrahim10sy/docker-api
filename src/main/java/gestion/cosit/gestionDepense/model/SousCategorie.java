@@ -1,8 +1,11 @@
 package gestion.cosit.gestionDepense.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -18,4 +21,11 @@ public class SousCategorie {
     @ManyToOne
     private CategorieDepense categorieDepense;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "sousCategorie",cascade = CascadeType.ALL)
+    private List<Depense> depenseList;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "sousCategorie",cascade = CascadeType.ALL)
+    private List<Salaire> salaireList;
 }

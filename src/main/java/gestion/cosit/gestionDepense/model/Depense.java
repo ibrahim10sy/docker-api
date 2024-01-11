@@ -34,6 +34,11 @@ public class Depense {
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date dateDepense;
 
+    @Column(nullable = false)
+    private boolean isViewed;
+
+    @Column(nullable = true)
+    private boolean autorisationAdmin;
 
     @ManyToOne
     @JoinColumn(name = "utilisateur_id")
@@ -47,7 +52,7 @@ public class Depense {
     private Demande demande;
 
     @ManyToOne
-    private CategorieDepense categorieDepense;
+    private SousCategorie sousCategorie;
 
     @ManyToOne
     private Bureau bureau;

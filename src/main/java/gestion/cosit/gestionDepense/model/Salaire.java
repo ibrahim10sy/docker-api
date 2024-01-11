@@ -1,6 +1,7 @@
 package gestion.cosit.gestionDepense.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import gestion.cosit.gestionDepense.repository.MasquerMontant;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class Salaire {
     @Column(length = 255, nullable = false)
     private String description;
 
+    @MasquerMontant
     @Column(nullable = false)
     private int montant;
 
@@ -29,4 +31,6 @@ public class Salaire {
     @ManyToOne
     private Utilisateur utilisateur;
 
+    @ManyToOne
+    private SousCategorie sousCategorie;
 }
