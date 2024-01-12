@@ -82,7 +82,11 @@ public class DepenseController {
     public ResponseEntity<Depense> marquer(@PathVariable long id){
         return  new ResponseEntity<>(depenseService.marquerView(id),HttpStatus.OK);
     }
-
+    @PutMapping("approuver/{id}")
+    @Operation(summary = "marquer comme view")
+    public ResponseEntity<Depense> approoverDepense(@PathVariable long id) throws Exception {
+        return  new ResponseEntity<>(depenseService.validateDepenseByAdmin(id),HttpStatus.OK);
+    }
     @GetMapping("/search")
     @Operation(summary = "Rechercher un budget par sa description")
     public ResponseEntity<List<Depense>> searchByDesc(@RequestParam("desc") String desc){

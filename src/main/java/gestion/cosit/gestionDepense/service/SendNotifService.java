@@ -78,36 +78,47 @@ public class SendNotifService {
         }
     }
 
-//    public void sendNotificationForApproval(Demande demande) throws Exception {
-//        try {
-//            // Créer le message de notification
-//            String msg = "Bonjour Mr " + demande.getUtilisateur().getNom().toUpperCase() + " " +
-//                    demande.getUtilisateur().getPrenom().toUpperCase() +
-//                    ".\n Votre demande a été approuvée par Mr " + demande.getAdmin().getNom().toUpperCase() +
-//                    " " + demande.getAdmin().getPrenom().toUpperCase();
-//
-//            // Configurer l'email
-//            SimpleMailMessage mailMessage = new SimpleMailMessage();
-//            mailMessage.setFrom(sender);
-//            mailMessage.setTo(demande.getUtilisateur().getEmail());
-//            mailMessage.setText(msg);
-//            mailMessage.setSubject("Alerte demande ");
-//
-//            // Envoyer l'email
-//            javaMailSender.send(mailMessage);
-//
-//            // Sauvegarder la notification
-//            SendNotification sendNotif = new SendNotification();
-//            sendNotif.setMessage(msg);
-//            sendNotif.setUtilisateur(demande.getUtilisateur());
-//            sendNotif.setAdmin(demande.getAdmin());
-//            sendNotif.setDate(new Date());
-//            sendNotif.setDemande(demande);
-//            sendNotifRepository.save(sendNotif);
-//        } catch (Exception e) {
-//            throw new Exception("Erreur lors de l'envoi de notification par e-mail : " + e.getMessage());
-//        }
-//    }
+    public void approuverDemandeByAdmin(Depense depense) throws BadRequestException {
+        String msg;
+        SendNotification sendNotif = new SendNotification();
+        Utilisateur utilisateur = depense.getUtilisateur();
+        Budget budget = depense.getBudget();
+        System.out.println("User dans send service"+utilisateur);
+        Admin admin = budget.getAdmin();
+        System.out.println("Admin dans send "+admin);
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+
+        msg = "Bonjour Mr "+  utilisateur.getNom().toUpperCase()  + " "+ utilisateur.getPrenom().toUpperCase() + ".\n Votre demande a été valider par M. " +  admin.getNom().toUpperCase()  + " " + admin.getPrenom().toUpperCase();
+
+        try {
+            // Sauvegarder l'entité Demande d'abord
+            depenseRepository.save(depense);
+
+            System.out.println("Debut de l'envoie dans le servive");
+            sendNotif.setMessage(msg);
+            mailMessage.setFrom(sender);
+            mailMessage.setTo(utilisateur.getEmail());
+            mailMessage.setText(sendNotif.getMessage());
+            mailMessage.setSubject("Alerte demande");
+
+            javaMailSender.send(mailMessage);
+
+            Date dateEnvoie = new Date();
+            Instant instant = dateEnvoie.toInstant();
+            ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+//            demande.setDateDemande(dateEnvoie);
+            sendNotif.setUtilisateur(utilisateur);
+            sendNotif.setAdmin(admin);
+            sendNotif.setDate(dateEnvoie);
+            sendNotif.setDepense(depense);
+            System.out.println("Fin de l'envoie dans le servive");
+
+            sendNotifRepository.save(sendNotif);
+        }catch (Exception e){
+            throw new BadRequestException(e.getMessage());
+        }
+    }
 
     public List<SendNotification> getAllNotifByUser(long id){
         List<SendNotification>  notifListe = sendNotifRepository.findByUtilisateurIdUtilisateur(id);

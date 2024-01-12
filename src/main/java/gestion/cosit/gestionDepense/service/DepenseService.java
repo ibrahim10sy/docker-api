@@ -139,7 +139,12 @@ public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) 
 
         // Valider la dépense
         depense.setAutorisationAdmin(true);
-
+        try {
+            System.out.println("Debut de l'envoi dans le service demande");
+            sendNotifService.approuverDemandeByAdmin(depense);
+        } catch (BadRequestException e) {
+            throw new RuntimeException(e);
+        }
         // Enregistrement la dépense validée
         return depenseRepository.save(depense);
     }
@@ -200,6 +205,7 @@ public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) 
         // Mettre à jour le montant restant du budget
         budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
         depense.setViewed(false);
+        depense.setAutorisationAdmin(true);
         System.out.println(depense);
         budgetRepository.save(budget);
 
