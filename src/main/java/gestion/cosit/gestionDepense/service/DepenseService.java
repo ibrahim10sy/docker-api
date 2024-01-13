@@ -111,9 +111,10 @@ public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) 
 
         // Ne pas ajouter la dépense immédiatement, attendre la validation de l'administrateur
         depense.setAutorisationAdmin(false);
-
+        budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
         // Enregistrement initial avec la dépense non validée
         depense = depenseRepository.save(depense);
+
     } else {
         // Montant inférieur au seuil, la dépense peut être enregistrée directement
         // Mettre à jour le montant restant du budget
@@ -139,15 +140,32 @@ public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) 
 
         // Valider la dépense
         depense.setAutorisationAdmin(true);
-        try {
-            System.out.println("Debut de l'envoi dans le service demande");
-            sendNotifService.approuverDemandeByAdmin(depense);
-        } catch (BadRequestException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            System.out.println("Debut de l'envoi dans le service demande");
+//            sendNotifService.approuverDemandeByAdmin(depense);
+//       }catch (Exception e){
+//            throw new RuntimeException(e);
+//       }
         // Enregistrement la dépense validée
         return depenseRepository.save(depense);
     }
+//    public Depense validateDepenseByAdmin(long depenseId) throws Exception {
+//        Depense depense = depenseRepository.findById(depenseId)
+//                .orElseThrow(() -> new NotFoundException("Dépense non trouvée"));
+//        depense.setAutorisationAdmin(true);
+//        try {
+//            // Approuver la demande en sauvegardant les modifications
+//            depenseRepository.save(depense);
+//
+//            // Envoyer la notification par e-mail
+//            SendNotification sendNotif = new SendNotification();
+//            sendNotifService.approuverDemandeByAdmin(depense, sendNotif);
+//        } catch (Exception e) {
+//            throw new Exception("Erreur lors de l'approbation de la demande : " + e.getMessage());
+//        }
+//        return depenseRepository.save(depense);
+//    }
+
     public Depense saveDepenseByAdmin(Depense depense , MultipartFile multipartFile) throws Exception {
         Admin admin = adminRepository.findByIdAdmin(depense.getAdmin().getIdAdmin());
         Budget budget = budgetRepository.findByIdBudget(depense.getBudget().getIdBudget());

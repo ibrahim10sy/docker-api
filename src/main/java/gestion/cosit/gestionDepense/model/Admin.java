@@ -10,7 +10,6 @@ import java.util.List;
 
 @Entity
 @Data
-//@JsonIgnoreProperties({"budgetList", "demandeList", "categorieList", "depenseList", "sendNotificationList"})
 public class Admin {
 
     @Id

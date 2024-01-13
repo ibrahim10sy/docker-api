@@ -65,7 +65,7 @@ public class Depense {
     @ManyToOne
     private ParametreDepense parametreDepense;
 
-    @OneToMany(mappedBy = "depense", orphanRemoval = true)
+    @OneToMany(mappedBy = "depense", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<SendNotification> notifications;
 }

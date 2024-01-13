@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Service
 public class SendNotifService {
@@ -77,25 +78,24 @@ public class SendNotifService {
             throw new BadRequestException(e.getMessage());
         }
     }
-
-    public void approuverDemandeByAdmin(Depense depense) throws BadRequestException {
+    public void approuverDemandeByAdmin(Depense depense, SendNotification sendNotif) throws BadRequestException {
         String msg;
-        SendNotification sendNotif = new SendNotification();
         Utilisateur utilisateur = depense.getUtilisateur();
         Budget budget = depense.getBudget();
-        System.out.println("User dans send service"+utilisateur);
+        System.out.println("User dans send service" + utilisateur);
         Admin admin = budget.getAdmin();
-        System.out.println("Admin dans send "+admin);
+        System.out.println("Admin dans send " + admin);
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
 
-        msg = "Bonjour Mr "+  utilisateur.getNom().toUpperCase()  + " "+ utilisateur.getPrenom().toUpperCase() + ".\n Votre demande a été valider par M. " +  admin.getNom().toUpperCase()  + " " + admin.getPrenom().toUpperCase();
+        msg = "Bonjour Mr " + utilisateur.getNom().toUpperCase() + " " + utilisateur.getPrenom().toUpperCase() +
+                ".\n Votre demande a été validée par M. " + admin.getNom().toUpperCase() + " " + admin.getPrenom().toUpperCase();
 
         try {
             // Sauvegarder l'entité Demande d'abord
             depenseRepository.save(depense);
 
-            System.out.println("Debut de l'envoie dans le servive");
+            System.out.println("Debut de l'envoi dans le service");
             sendNotif.setMessage(msg);
             mailMessage.setFrom(sender);
             mailMessage.setTo(utilisateur.getEmail());
@@ -107,25 +107,67 @@ public class SendNotifService {
             Date dateEnvoie = new Date();
             Instant instant = dateEnvoie.toInstant();
             ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
-//            demande.setDateDemande(dateEnvoie);
             sendNotif.setUtilisateur(utilisateur);
             sendNotif.setAdmin(admin);
             sendNotif.setDate(dateEnvoie);
             sendNotif.setDepense(depense);
-            System.out.println("Fin de l'envoie dans le servive");
+            System.out.println("Fin de l'envoi dans le service");
 
             sendNotifRepository.save(sendNotif);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
     }
+
+//    public void approuverDemandeByAdmin(Depense depense) throws BadRequestException {
+//        String msg;
+//        SendNotification sendNotif = new SendNotification();
+//        Utilisateur utilisateur = depense.getUtilisateur();
+////        Budget budget = depense.getBudget();
+//        System.out.println("User dans send service"+utilisateur);
+////        Admin admin = budget.getAdmin();
+////        System.out.println("Admin dans send "+admin);
+//
+//        SimpleMailMessage mailMessage = new SimpleMailMessage();
+//
+//        msg = "Bonjour Mr "+  utilisateur.getNom().toUpperCase()  + " "+ utilisateur.getPrenom().toUpperCase() + ".\n Votre demande a été valider par M. " ;
+//
+//        try {
+//            // Sauvegarder l'entité Demande d'abord
+////            depenseRepository.save(depense);
+//
+//            System.out.println("Debut de l'envoie dans le servive");
+//            sendNotif.setMessage(msg);
+//            mailMessage.setFrom(sender);
+//            mailMessage.setTo(utilisateur.getEmail());
+//            mailMessage.setText(sendNotif.getMessage());
+//            mailMessage.setSubject("Alerte demande");
+//
+//            javaMailSender.send(mailMessage);
+//
+//            Date dateEnvoie = new Date();
+//            Instant instant = dateEnvoie.toInstant();
+//            ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+//            sendNotif.setUtilisateur(utilisateur);
+////            sendNotif.setAdmin(admin);
+//            sendNotif.setDate(dateEnvoie);
+////            sendNotif.setDepense(depense);
+//            System.out.println("Fin de l'envoie dans le servive");
+//
+//            sendNotifRepository.save(sendNotif);
+//        }catch (Exception e){
+//            throw new BadRequestException(e.getMessage());
+//        }
+//    }
 
     public List<SendNotification> getAllNotifByUser(long id){
         List<SendNotification>  notifListe = sendNotifRepository.findByUtilisateurIdUtilisateur(id);
         if(notifListe.isEmpty()){
             throw new EntityNotFoundException("Aucune notifiaction  trouvé");
         }
-
+        notifListe = notifListe
+                .stream().sorted((d1, d2) -> d2.getMessage().compareTo(d1.getMessage()))
+                .collect(Collectors.toList());
         return notifListe;
     }
     public List<SendNotification> getAllNotif(){
@@ -133,6 +175,10 @@ public class SendNotifService {
         if(notifListe.isEmpty()){
             throw new EntityNotFoundException("Aucune notifiaction  trouvé");
         }
+
+        notifListe = notifListe
+                .stream().sorted((d1, d2) -> d2.getMessage().compareTo(d1.getMessage()))
+                .collect(Collectors.toList());
 
         return notifListe;
     }
