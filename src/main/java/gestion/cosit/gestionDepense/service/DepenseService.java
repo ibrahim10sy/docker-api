@@ -111,7 +111,7 @@ public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) 
 
         // Ne pas ajouter la dépense immédiatement, attendre la validation de l'administrateur
         depense.setAutorisationAdmin(false);
-        budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
+
         // Enregistrement initial avec la dépense non validée
         depense = depenseRepository.save(depense);
 
@@ -137,15 +137,25 @@ public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) 
     public Depense validateDepenseByAdmin(Long depenseId) throws Exception {
         Depense depense = depenseRepository.findById(depenseId)
                 .orElseThrow(() -> new NotFoundException("Dépense non trouvée"));
-
+        Budget budget = depense.getBudget();
         // Valider la dépense
         depense.setAutorisationAdmin(true);
+
+        if (depense.getMontantDepense() > budget.getMontantRestant()) {
+            throw new BadRequestException("Le montant de la dépense ne doit pas être supérieur à celui du montant restant du budget " );
+        } else if (budget.getMontantRestant() == 0) {
+            throw new BadRequestException("Le  montant restant du budget est atteint" );
+
+        }
+        budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
 //        try {
 //            System.out.println("Debut de l'envoi dans le service demande");
 //            sendNotifService.approuverDemandeByAdmin(depense);
 //       }catch (Exception e){
 //            throw new RuntimeException(e);
 //       }
+        // Mettre à jour le montant restant du budget
+        budgetRepository.save(budget);
         // Enregistrement la dépense validée
         return depenseRepository.save(depense);
     }

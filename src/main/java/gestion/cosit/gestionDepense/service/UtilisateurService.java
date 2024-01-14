@@ -24,42 +24,44 @@ public class UtilisateurService {
 
     //Methode pour créer un user
 
-    public Utilisateur createUser(Utilisateur utilisateur, MultipartFile multipartFile) throws Exception {
+    public Utilisateur createUser(Utilisateur utilisateur, MultipartFile multipartFileImage) throws Exception {
         if(utilisateurRepository.findByEmail(utilisateur.getEmail()) == null){
-            if(multipartFile != null){
+            if (multipartFileImage != null) {
                 String location = "C:\\xampp\\htdocs\\cosit";
-                try{
+                System.out.println("verif");
+                try {
                     Path rootlocation = Paths.get(location);
-                    if(!Files.exists(rootlocation)){
+                    if (!Files.exists(rootlocation)) {
                         Files.createDirectories(rootlocation);
-                        Files.copy(multipartFile.getInputStream(),
-                                rootlocation.resolve(multipartFile.getOriginalFilename()));
+                        Files.copy(multipartFileImage.getInputStream(),
+                                rootlocation.resolve(multipartFileImage.getOriginalFilename()));
                         utilisateur.setImage("cosit/"
-                                +multipartFile.getOriginalFilename());
-                    }else{
+                                + multipartFileImage.getOriginalFilename());
+                    } else {
+                        System.out.println("Autre condition");
                         try {
-                            String nom = location+"\\"+multipartFile.getOriginalFilename();
+                            String nom = location + "\\" + multipartFileImage.getOriginalFilename();
                             Path name = Paths.get(nom);
-                            if(!Files.exists(name)){
-                                Files.copy(multipartFile.getInputStream(),
-                                        rootlocation.resolve(multipartFile.getOriginalFilename()));
+                            if (!Files.exists(name)) {
+                                Files.copy(multipartFileImage.getInputStream(),
+                                        rootlocation.resolve(multipartFileImage.getOriginalFilename()));
                                 utilisateur.setImage("cosit/"
-                                        +multipartFile.getOriginalFilename());
-                            }else{
+                                        + multipartFileImage.getOriginalFilename());
+                            } else {
                                 Files.delete(name);
-                                Files.copy(multipartFile.getInputStream(),rootlocation.resolve(multipartFile.getOriginalFilename()));
+                                Files.copy(multipartFileImage.getInputStream(), rootlocation.resolve(multipartFileImage.getOriginalFilename()));
                                 utilisateur.setImage("cosit/"
-                                        +multipartFile.getOriginalFilename());
+                                        + multipartFileImage.getOriginalFilename());
                             }
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             throw new Exception("Impossible de télécharger l\'image");
                         }
                     }
-                } catch (Exception e){
+                } catch (Exception e) {
                     throw new Exception(e.getMessage());
                 }
             }
-            System.out.println(utilisateur);
+            System.out.println("user service"+utilisateur);
             return  utilisateurRepository.save(utilisateur);
         }else{
             throw new EntityExistsException("Cet compte existe déjà");

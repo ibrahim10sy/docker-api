@@ -30,7 +30,7 @@ public class UtilisateurController {
     @Operation(summary = "Création d'un utilisateur")
     public ResponseEntity<Utilisateur> createUtilisateur(
             @Valid @RequestParam("utilisateur") String utilisateurString,
-            @RequestParam(value ="image", required=false) MultipartFile multipartFile) throws Exception {
+            @RequestParam(value ="images", required=false) MultipartFile multipartFile) throws Exception {
 
         Utilisateur utilisateur = new Utilisateur();
         try{
@@ -40,7 +40,7 @@ public class UtilisateurController {
         }
 
         Utilisateur savedUser = utilisateurService.createUser(utilisateur,multipartFile);
-
+        System.out.println("User controller"+savedUser);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
