@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -48,7 +49,7 @@ public class SendNotifService {
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
 
-        msg = "Bonjour Mr "+ admin.getNom().toUpperCase()  + " " + admin.getPrenom().toUpperCase()  + ".\n Vous avez reçus une nouvelle demande de la part de  Mr" + utilisateur.getNom().toUpperCase()  + " "+ utilisateur.getPrenom().toUpperCase() ;
+        msg = "Bonjour M/Mme "+ admin.getNom().toUpperCase()  + " " + admin.getPrenom().toUpperCase()  + ".\n Vous avez reçus une nouvelle demande de la part de  Mr" + utilisateur.getNom().toUpperCase()  + " "+ utilisateur.getPrenom().toUpperCase() ;
 
         try {
             // Sauvegarder l'entité Demande d'abord
@@ -90,7 +91,7 @@ public class SendNotifService {
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
 
-        msg1 = "Nouvelle dépense d'une somme de " +depense.getMontantDepense()+ " de la part de  Mr " + utilisateur.getNom().toUpperCase()  + " "+ utilisateur.getPrenom().toUpperCase() ;
+        msg1 = "Nouvelle dépense d'une somme de " +depense.getMontantDepense()+ " de la part de  M/Mme " + utilisateur.getNom().toUpperCase()  + " "+ utilisateur.getPrenom().toUpperCase() ;
 
         try {
             // Sauvegarder l'entité Demande d'abord
@@ -101,7 +102,7 @@ public class SendNotifService {
             mailMessage.setFrom(sender);
             mailMessage.setTo(admin.getEmail());
             mailMessage.setText(sendNotif.getMessage());
-            mailMessage.setSubject("Alerte demande");
+            mailMessage.setSubject("Alerte dépense");
 
             javaMailSender.send(mailMessage);
 
@@ -120,42 +121,24 @@ public class SendNotifService {
             throw new BadRequestException(e.getMessage());
         }
     }
-    public void approuverDemandeByAdmin(Depense depense, SendNotification sendNotif) throws BadRequestException {
+    @Transactional
+    public void approuverDemandeByAdmin(Depense depense) throws BadRequestException {
         String msg;
+        SendNotification sendNotif = new SendNotification();
         Utilisateur utilisateur = depense.getUtilisateur();
         Budget budget = depense.getBudget();
-        System.out.println("User dans send service" + utilisateur);
         Admin admin = budget.getAdmin();
-        System.out.println("Admin dans send " + admin);
-
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-
-        msg = "Bonjour Mr " + utilisateur.getNom().toUpperCase() + " " + utilisateur.getPrenom().toUpperCase() +
+        msg = "Bonjour M/Mme " + utilisateur.getNom().toUpperCase() + " " + utilisateur.getPrenom().toUpperCase() +
                 ".\n Votre demande a été validée par M. " + admin.getNom().toUpperCase() + " " + admin.getPrenom().toUpperCase();
-
         try {
-            // Sauvegarder l'entité Demande d'abord
-            depenseRepository.save(depense);
-
-            System.out.println("Debut de l'envoi dans le service");
+            System.out.println("Validation dans le ser notif");
             sendNotif.setMessage(msg);
-            mailMessage.setFrom(sender);
-            mailMessage.setTo(utilisateur.getEmail());
-            mailMessage.setText(sendNotif.getMessage());
-            mailMessage.setSubject("Alerte demande");
-
-            javaMailSender.send(mailMessage);
-
-            Date dateEnvoie = new Date();
-            Instant instant = dateEnvoie.toInstant();
-            ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
             sendNotif.setUtilisateur(utilisateur);
             sendNotif.setAdmin(admin);
-            sendNotif.setDate(dateEnvoie);
+            sendNotif.setDate(new Date());
             sendNotif.setDepense(depense);
-            System.out.println("Fin de l'envoi dans le service");
-
             sendNotifRepository.save(sendNotif);
+            System.out.println("Fin Validation dans le ser notif");
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }

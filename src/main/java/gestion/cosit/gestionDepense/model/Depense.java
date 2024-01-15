@@ -18,9 +18,6 @@ public class Depense {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idDepense;
 
-//    @Column(length = 255, nullable = false)
-//    private String libelle;
-
     @Column(nullable = true)
     private  String image;
 

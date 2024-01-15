@@ -1,6 +1,7 @@
 package gestion.cosit.gestionDepense.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -28,13 +29,16 @@ public class SendNotification {
 
     @ManyToOne
     @JoinColumn(name = "idUtilisateur")
+    @JsonIgnore
     private Utilisateur utilisateur;
 
     @ManyToOne
     @JoinColumn(name = "idAdmin")
+    @JsonIgnore
     private Admin admin;
 
     @ManyToOne
     @JoinColumn(name="idDepense")
+    @JsonIgnore
     private Depense depense;
 }
