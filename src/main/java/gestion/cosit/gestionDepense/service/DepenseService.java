@@ -126,6 +126,14 @@ public class DepenseService {
 
             // Enregistrer la dépense mise à jour
             depense = depenseRepository.save(depense);
+
+            try {
+                System.out.println("Debut de l'envoi dans le service demande dans else");
+                sendNotifService.sendDepense(depense);
+            } catch (BadRequestException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println("Fin de l'envoi dans le service demande else");
         }
 
         // Mettre à jour le montant restant du budget

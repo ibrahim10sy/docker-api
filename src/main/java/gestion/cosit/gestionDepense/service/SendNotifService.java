@@ -79,47 +79,47 @@ public class SendNotifService {
         }
     }
 
-//    public void sendDepense(Depense depense) throws BadRequestException {
-//        String msg1;
-//        SendNotification sendNotif = new SendNotification();
-//        Utilisateur utilisateur = depense.getUtilisateur();
-//        Budget budget = depense.getBudget();
-//        System.out.println("User dans send service"+utilisateur);
-//        Admin admin = budget.getAdmin();
-//        System.out.println("Admin dans send "+admin);
-//
-//        SimpleMailMessage mailMessage = new SimpleMailMessage();
-//
-//        msg1 = "Nouvelle dépense d'une somme de " +depense.getMontantDepense()+ " de la part de  Mr " + utilisateur.getNom().toUpperCase()  + " "+ utilisateur.getPrenom().toUpperCase() ;
-//
-//        try {
-//            // Sauvegarder l'entité Demande d'abord
-//            depenseRepository.save(depense);
-//
-//            System.out.println("Debut de l'envoie ");
-//            sendNotif.setMessage(msg1);
-//            mailMessage.setFrom(sender);
-//            mailMessage.setTo(admin.getEmail());
-//            mailMessage.setText(sendNotif.getMessage());
-//            mailMessage.setSubject("Alerte demande");
-//
-//            javaMailSender.send(mailMessage);
-//
-//            Date dateEnvoie = new Date();
-//            Instant instant = dateEnvoie.toInstant();
-//            ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
-////            demande.setDateDemande(dateEnvoie);
-//            sendNotif.setUtilisateur(utilisateur);
-//            sendNotif.setAdmin(admin);
-//            sendNotif.setDate(dateEnvoie);
-//            sendNotif.setDepense(depense);
-//            System.out.println("Fin de l'envoie");
-//
-//            sendNotifRepository.save(sendNotif);
-//        }catch (Exception e){
-//            throw new BadRequestException(e.getMessage());
-//        }
-//    }
+    public void sendDepense(Depense depense) throws BadRequestException {
+        String msg1;
+        SendNotification sendNotif = new SendNotification();
+        Utilisateur utilisateur = depense.getUtilisateur();
+        Budget budget = depense.getBudget();
+        System.out.println("User dans send service"+utilisateur);
+        Admin admin = budget.getAdmin();
+        System.out.println("Admin dans send "+admin);
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+
+        msg1 = "Nouvelle dépense d'une somme de " +depense.getMontantDepense()+ " de la part de  Mr " + utilisateur.getNom().toUpperCase()  + " "+ utilisateur.getPrenom().toUpperCase() ;
+
+        try {
+            // Sauvegarder l'entité Demande d'abord
+            depenseRepository.save(depense);
+
+            System.out.println("Debut de l'envoie ");
+            sendNotif.setMessage(msg1);
+            mailMessage.setFrom(sender);
+            mailMessage.setTo(admin.getEmail());
+            mailMessage.setText(sendNotif.getMessage());
+            mailMessage.setSubject("Alerte demande");
+
+            javaMailSender.send(mailMessage);
+
+            Date dateEnvoie = new Date();
+            Instant instant = dateEnvoie.toInstant();
+            ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+//            demande.setDateDemande(dateEnvoie);
+            sendNotif.setUtilisateur(utilisateur);
+            sendNotif.setAdmin(admin);
+            sendNotif.setDate(dateEnvoie);
+            sendNotif.setDepense(depense);
+            System.out.println("Fin de l'envoie");
+
+            sendNotifRepository.save(sendNotif);
+        }catch (Exception e){
+            throw new BadRequestException(e.getMessage());
+        }
+    }
     public void approuverDemandeByAdmin(Depense depense, SendNotification sendNotif) throws BadRequestException {
         String msg;
         Utilisateur utilisateur = depense.getUtilisateur();
