@@ -44,95 +44,95 @@ public class DepenseService {
     @Autowired
     SendNotifService sendNotifService;
 
-public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) throws Exception {
-    Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(depense.getUtilisateur().getIdUtilisateur());
-    SousCategorie sousCategorie = sousCategorieRepository.findByIdSousCategorie(depense.getSousCategorie().getIdSousCategorie());
-    Budget budget = budgetRepository.findByIdBudget(depense.getBudget().getIdBudget());
-    ParametreDepense parametreDepense = parametreDepenseRepository.findByIdParametre(depense.getParametreDepense().getIdParametre());
+    public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) throws Exception {
+        Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(depense.getUtilisateur().getIdUtilisateur());
+        SousCategorie sousCategorie = sousCategorieRepository.findByIdSousCategorie(depense.getSousCategorie().getIdSousCategorie());
+        Budget budget = budgetRepository.findByIdBudget(depense.getBudget().getIdBudget());
+        ParametreDepense parametreDepense = parametreDepenseRepository.findByIdParametre(depense.getParametreDepense().getIdParametre());
 
-    if(budget == null)
-        throw new BadRequestException("Desolé ce budget n'existe pas");
+        if(budget == null)
+            throw new BadRequestException("Desolé ce budget n'existe pas");
 
-    if(sousCategorie == null)
-        throw new BadRequestException("Desolé cette catégorie n'existe pas");
+        if(sousCategorie == null)
+            throw new BadRequestException("Desolé cette catégorie n'existe pas");
 
-    if (utilisateur == null)
-        throw new BadRequestException("Utilisateur invalid");
+        if (utilisateur == null)
+            throw new BadRequestException("Utilisateur invalid");
 
-    if(multipartFile != null){
-        String location = "C:\\xampp\\htdocs\\cosit";
-        try{
-            Path rootlocation = Paths.get(location);
-            if(!Files.exists(rootlocation)){
-                Files.createDirectories(rootlocation);
-                Files.copy(multipartFile.getInputStream(),
-                        rootlocation.resolve(multipartFile.getOriginalFilename()));
-                depense.setImage("cosit/"
-                        +multipartFile.getOriginalFilename());
-            }else{
-                try {
-                    String nom = location+"\\"+multipartFile.getOriginalFilename();
-                    Path name = Paths.get(nom);
-                    if(!Files.exists(name)){
-                        Files.copy(multipartFile.getInputStream(),
-                                rootlocation.resolve(multipartFile.getOriginalFilename()));
-                        depense.setImage("cosit/"
-                                +multipartFile.getOriginalFilename());
-                    }else{
-                        Files.delete(name);
-                        Files.copy(multipartFile.getInputStream(),rootlocation.resolve(multipartFile.getOriginalFilename()));
-                        depense.setImage("cosit/"
-                                +multipartFile.getOriginalFilename());
+        if(multipartFile != null){
+            String location = "C:\\xampp\\htdocs\\cosit";
+            try{
+                Path rootlocation = Paths.get(location);
+                if(!Files.exists(rootlocation)){
+                    Files.createDirectories(rootlocation);
+                    Files.copy(multipartFile.getInputStream(),
+                            rootlocation.resolve(multipartFile.getOriginalFilename()));
+                    depense.setImage("cosit/"
+                            +multipartFile.getOriginalFilename());
+                }else{
+                    try {
+                        String nom = location+"\\"+multipartFile.getOriginalFilename();
+                        Path name = Paths.get(nom);
+                        if(!Files.exists(name)){
+                            Files.copy(multipartFile.getInputStream(),
+                                    rootlocation.resolve(multipartFile.getOriginalFilename()));
+                            depense.setImage("cosit/"
+                                    +multipartFile.getOriginalFilename());
+                        }else{
+                            Files.delete(name);
+                            Files.copy(multipartFile.getInputStream(),rootlocation.resolve(multipartFile.getOriginalFilename()));
+                            depense.setImage("cosit/"
+                                    +multipartFile.getOriginalFilename());
+                        }
+                    }catch (Exception e){
+                        throw new Exception("Impossible de télécharger l\'image");
                     }
-                }catch (Exception e){
-                    throw new Exception("Impossible de télécharger l\'image");
                 }
+            } catch (Exception e){
+                throw new Exception(e.getMessage());
             }
-        } catch (Exception e){
-            throw new Exception(e.getMessage());
         }
-    }
 
-    if (depense.getMontantDepense() > budget.getMontantRestant()) {
-        throw new BadRequestException("Le montant de la dépense ne doit pas être supérieur à celui du montant restant du budget " );
-    } else if (budget.getMontantRestant() == 0) {
-        throw new BadRequestException("Le  montant restant du budget est atteint" );
+        if (depense.getMontantDepense() > budget.getMontantRestant()) {
+            throw new BadRequestException("Le montant de la dépense ne doit pas être supérieur à celui du montant restant du budget " );
+        } else if (budget.getMontantRestant() == 0) {
+            throw new BadRequestException("Le  montant restant du budget est atteint" );
 
-    }
-    if (depense.getMontantDepense() >= depense.getParametreDepense().getMontantSeuil()) {
-        // Montant supérieur ou égal au seuil, envoie de notification
-        try {
-            System.out.println("Debut de l'envoi dans le service demande");
-            sendNotifService.sendDemande(depense);
-        } catch (BadRequestException e) {
-            throw new RuntimeException(e);
         }
-        System.out.println("Fin de l'envoi dans le service demande");
+        if (depense.getMontantDepense() >= depense.getParametreDepense().getMontantSeuil()) {
+            // Montant supérieur ou égal au seuil, envoie de notification
+            try {
+                System.out.println("Debut de l'envoi dans le service demande");
+                sendNotifService.sendDemande(depense);
+            } catch (BadRequestException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println("Fin de l'envoi dans le service demande");
 
-        // Ne pas ajouter la dépense immédiatement, attendre la validation de l'administrateur
-        depense.setAutorisationAdmin(false);
+            // Ne pas ajouter la dépense immédiatement, attendre la validation de l'administrateur
+            depense.setAutorisationAdmin(false);
 
-        // Enregistrement initial avec la dépense non validée
-        depense = depenseRepository.save(depense);
+            // Enregistrement initial avec la dépense non validée
+            depense = depenseRepository.save(depense);
 
-    } else {
-        // Montant inférieur au seuil, la dépense peut être enregistrée directement
+        } else {
+            // Montant inférieur au seuil, la dépense peut être enregistrée directement
+            // Mettre à jour le montant restant du budget
+            budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
+            depense.setViewed(false);
+
+            // Marquer la dépense comme validée car elle n'a pas besoin de validation administrative
+            depense.setAutorisationAdmin(true);
+
+            // Enregistrer la dépense mise à jour
+            depense = depenseRepository.save(depense);
+        }
+
         // Mettre à jour le montant restant du budget
-        budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
-        depense.setViewed(false);
+        budgetRepository.save(budget);
 
-        // Marquer la dépense comme validée car elle n'a pas besoin de validation administrative
-        depense.setAutorisationAdmin(true);
-
-        // Enregistrer la dépense mise à jour
-        depense = depenseRepository.save(depense);
+        return depense;
     }
-
-    // Mettre à jour le montant restant du budget
-    budgetRepository.save(budget);
-
-    return depense;
-}
     // Méthode permettant de  valider la dépense par l'administrateur
     public Depense validateDepenseByAdmin(Long depenseId) throws Exception {
         Depense depense = depenseRepository.findById(depenseId)

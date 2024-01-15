@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SousCategorieService {
@@ -52,6 +53,10 @@ public List<SousCategorie> getAllSousCategorie(long idCategoriedepense){
         List<SousCategorie> sousCategorieList = sousCategorieRepository.findAll();
         if(sousCategorieList.isEmpty())
             throw new NoContentException("Aucune sous categorie trouvé");
+
+        sousCategorieList = sousCategorieList
+                .stream().sorted((d1, d2) -> d2.getLibelle().compareTo(d1.getLibelle()))
+                .collect(Collectors.toList());
         return sousCategorieList;
     }
     public String supprimer(long idSousCategorie){

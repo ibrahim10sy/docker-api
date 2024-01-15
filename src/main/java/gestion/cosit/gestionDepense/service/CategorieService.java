@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CategorieService {
@@ -70,7 +71,9 @@ public class CategorieService {
         if(categoriesListe.isEmpty()){
             throw new EntityNotFoundException("Aucun categorie trouvé");
         }
-
+        categoriesListe = categoriesListe
+                .stream().sorted((d1, d2) -> d2.getLibelle().compareTo(d1.getLibelle()))
+                .collect(Collectors.toList());
         return categoriesListe;
     }
 
@@ -81,10 +84,18 @@ public class CategorieService {
             throw new EntityNotFoundException("Aucun categorie trouvé");
         }
 
+        categoriesListe = categoriesListe
+                .stream().sorted((d1, d2) -> d2.getLibelle().compareTo(d1.getLibelle()))
+                .collect(Collectors.toList());
         return categoriesListe;
     }
     public List<CategorieDepense> lire(){
-        return categorieRepository.findAll();
+        List<CategorieDepense> categorieDepenseListe = categorieRepository.findAll();
+
+        categorieDepenseListe = categorieDepenseListe
+                .stream().sorted((d1, d2) -> d2.getLibelle().compareTo(d1.getLibelle()))
+                .collect(Collectors.toList());
+        return categorieDepenseListe;
     }
 
     public String deleteCategorieById(long id){

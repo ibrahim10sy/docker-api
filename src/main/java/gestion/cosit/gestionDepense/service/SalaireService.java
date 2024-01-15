@@ -76,7 +76,7 @@ public class SalaireService {
             throw new NoContentException("Aucun salaire trouvé");
 
         salaireList = salaireList
-                .stream().sorted((d1, d2) -> d2.getDescription().compareTo(d1.getDescription()))
+                .stream().sorted((d1, d2) -> d2.getUtilisateur().getEmail().compareTo(d1.getUtilisateur().getEmail()))
                 .collect(Collectors.toList());
         return salaireList;
     }

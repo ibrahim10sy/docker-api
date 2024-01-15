@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UtilisateurService {
@@ -79,7 +80,12 @@ public class UtilisateurService {
 //    }
 
     public List<Utilisateur> lire(){
-        return utilisateurRepository.findAll();
+        List<Utilisateur> utilisateurList = utilisateurRepository.findAll();
+
+        utilisateurList = utilisateurList
+                .stream().sorted((d1, d2) -> d2.getEmail().compareTo(d1.getEmail()))
+                .collect(Collectors.toList());
+        return utilisateurList;
     }
 
     //Méthode de recupperation d'un seul user
