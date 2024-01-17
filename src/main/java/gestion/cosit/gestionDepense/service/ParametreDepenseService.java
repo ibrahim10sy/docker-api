@@ -21,7 +21,7 @@ public class ParametreDepenseService {
     public ParametreDepense updateParametre(ParametreDepense parametreDepense, long id){
         ParametreDepense parametreDepense1 = parametreDepenseRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Aucun parametre trouvé"));
 
-        parametreDepense1.setDescription(parametreDepense1.getDescription());
+        parametreDepense1.setDescription(parametreDepense.getDescription());
         parametreDepense1.setMontantSeuil(parametreDepense.getMontantSeuil());
 
         return parametreDepenseRepository.save(parametreDepense1);

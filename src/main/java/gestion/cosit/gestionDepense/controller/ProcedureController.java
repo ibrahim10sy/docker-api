@@ -18,18 +18,33 @@ public class ProcedureController {
     @Autowired
     private ProcedureService procedureService;
 
-    @GetMapping("/expensesByAdmin/{adminId}")
-    @Operation(summary = "Donner la statistique des depenses par categorie")
-    public List<Map<String, Object>> getTotalExpensesByCategoryByAdmin(@PathVariable Long adminId) {
-        return procedureService.getTotalDepenseByAdmin(adminId);
-    }
+//    @GetMapping("/expensesByAdmin/{adminId}")
+//    @Operation(summary = "Donner la statistique des depenses par categorie")
+//    public List<Map<String, Object>> getTotalExpensesByCategoryByAdmin(@PathVariable Long adminId) {
+//        return procedureService.getTotalDepenseByAdmin(adminId);
+//    }
 
-    @GetMapping("/expensesByUser/{userId}")
-    @Operation(summary = "Donner la statistique des depenses par categorie")
+    @GetMapping("/expensesByUserByJour/{userId}")
+    @Operation(summary = "Donner la statistique des depenses par categorie jours")
     public List<Map<String, Object>> getTotalExpensesByCategoryByUser(@PathVariable Long userId) {
-        return procedureService.getTotalDepenseByUser(userId);
+        return procedureService.getTotalDepenseByUserByJour(userId);
+    }
+    @GetMapping("/expensesByUserByMois/{userId}")
+    @Operation(summary = "Donner la statistique des depenses par categorie par mois")
+    public List<Map<String, Object>> getTotalExpensesByCategoryByUserMois(@PathVariable Long userId) {
+        return procedureService.getTotalDepenseByUserByMois(userId);
+    }
+    @GetMapping("/expensesByTotalByJour")
+    @Operation(summary = "Donner la statistique des depenses par categorie")
+    public List<Map<String, Object>> getTotalExpensesByJour() {
+        return procedureService.getTotalDepenseByJour();
     }
 
+    @GetMapping("/expensesByTotalMois")
+    @Operation(summary = "Donner la statistique des depenses par categorie")
+    public List<Map<String, Object>> getTotalExpensesByMois() {
+        return procedureService.getTotalDepenseByMois();
+    }
     @GetMapping("/expensesByTotal")
     @Operation(summary = "Donner la statistique des depenses par categorie")
     public List<Map<String, Object>> getTotalExpensesByCategory() {

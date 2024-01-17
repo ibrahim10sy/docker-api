@@ -129,16 +129,23 @@ public class SendNotifService {
         Budget budget = depense.getBudget();
         Admin admin = budget.getAdmin();
         msg = "Bonjour M/Mme " + utilisateur.getNom().toUpperCase() + " " + utilisateur.getPrenom().toUpperCase() +
-                ".\n Votre demande a été validée par M. " + admin.getNom().toUpperCase() + " " + admin.getPrenom().toUpperCase();
+                ".\n Votre demande de " + depense.getMontantDepense() +" a été validée par M. " + admin.getNom().toUpperCase() + " " + admin.getPrenom().toUpperCase();
+
         try {
-            System.out.println("Validation dans le ser notif");
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
             sendNotif.setMessage(msg);
             sendNotif.setUtilisateur(utilisateur);
             sendNotif.setAdmin(admin);
             sendNotif.setDate(new Date());
             sendNotif.setDepense(depense);
+
+            mailMessage.setFrom(sender);
+            mailMessage.setTo(utilisateur.getEmail());
+            mailMessage.setSubject("Alert validation");
+            mailMessage.setText(msg);
+
+            javaMailSender.send(mailMessage);
             sendNotifRepository.save(sendNotif);
-            System.out.println("Fin Validation dans le ser notif");
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
