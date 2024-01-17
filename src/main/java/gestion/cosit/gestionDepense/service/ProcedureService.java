@@ -19,13 +19,18 @@ public class ProcedureService {
 //    }
 
     public List<Map<String, Object>> getTotalDepenseByUserByJour(Long userId){
-        String query = "CALL DepensesParCategorieParJourUtilisateur";
+        String query = "CALL DepensesParCategorieParJourUtilisateur(?)";
         return jdbcTemplate.queryForList(query,userId);
     }
     public List<Map<String, Object>> getTotalDepenseByUserByMois(Long userId){
-        String query = "CALL DepensesParCategorieParMoisUtilisateur";
+        String query = "CALL DepensesParCategorieParMoisUtilisateur(?)";
         return jdbcTemplate.queryForList(query,userId);
     }
+    public List<Map<String, Object>> getTotalDepenseByUser(Long userId){
+        String query = "CALL GetDepenseTotalByUsers(?)";
+        return jdbcTemplate.queryForList(query,userId);
+    }
+
     public List<Map<String, Object>> getTotalDepense(){
         String query = "CALL GetDepenseTotal()";
         return jdbcTemplate.queryForList(query);

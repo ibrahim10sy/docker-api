@@ -29,16 +29,16 @@ public class SendNotification {
 
     @ManyToOne
     @JoinColumn(name = "idUtilisateur")
-    @JsonIgnore
+   //@JsonIgnore
     private Utilisateur utilisateur;
 
     @ManyToOne
     @JoinColumn(name = "idAdmin")
-    @JsonIgnore
-    private Admin admin;
 
+    private Admin admin;
+    //@JsonIgnore
     @ManyToOne
     @JoinColumn(name="idDepense")
-    @JsonIgnore
+    //@JsonIgnore
     private Depense depense;
 }
