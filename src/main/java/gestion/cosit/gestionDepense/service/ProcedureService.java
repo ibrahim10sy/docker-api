@@ -45,4 +45,9 @@ public class ProcedureService {
         String query = "CALL GetDepenseParMois()";
         return jdbcTemplate.queryForList(query);
     }
+
+    public List<Map<String, Object>> getTotalDepenseBySousCategorie(long id){
+        String query = "CALL GetTotalDepenseParSousCategorie(?)";
+        return jdbcTemplate.queryForList(query, id);
+    }
 }

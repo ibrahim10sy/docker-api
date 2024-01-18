@@ -68,17 +68,6 @@ public class UtilisateurService {
             throw new EntityExistsException("Cet compte existe déjà");
         }
     }
-
-    //Méthode de recupperation des users
-//    public List<Utilisateur> getAllUser(){
-//        List<Utilisateur>  utilisateurs = utilisateurRepository.findAll();
-//        if(utilisateurs.isEmpty()){
-//            throw new NoContentException("Aucun employé  trouvé");
-//        }
-//
-//        return utilisateurs;
-//    }
-
     public List<Utilisateur> lire(){
         List<Utilisateur> utilisateurList = utilisateurRepository.findAll();
 
