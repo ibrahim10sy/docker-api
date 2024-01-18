@@ -50,4 +50,9 @@ public class ProcedureService {
         String query = "CALL GetTotalDepenseParSousCategorie(?)";
         return jdbcTemplate.queryForList(query, id);
     }
+
+    public List<Map<String, Object>> getTotalDepenseBySousCategorieByUsers(long idCategorie,long idUser){
+        String query = "CALL GetTotalBySousCatByUser(?,?)";
+        return jdbcTemplate.queryForList(query,idCategorie,idUser);
+    }
 }
