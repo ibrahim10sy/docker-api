@@ -7,6 +7,7 @@ import gestion.cosit.gestionDepense.repository.AdminRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.webjars.NotFoundException;
@@ -21,11 +22,15 @@ public class AdminService {
 
     @Autowired
     private AdminRepository adminRepository;
-
+    @Autowired
+    BCryptPasswordEncoder passwordEncoder;
     //création de admin
 
     public Admin createAdmin(Admin admin, MultipartFile multipartFile) throws Exception {
         if(adminRepository.findByEmail(admin.getEmail()) == null){
+
+            String passWordHasher = passwordEncoder.encode(admin.getPassWord());
+            admin.setPassWord(passWordHasher);
             if(multipartFile != null){
                 String location = "C:\\xampp\\htdocs\\cosit";
                 try{
@@ -88,7 +93,11 @@ public class AdminService {
         admin1.setPrenom(admin.getPrenom());
         admin1.setEmail(admin.getEmail());
         admin1.setPassWord(admin.getPassWord());
-
+        // Mettez à jour le mot de passe si un nouveau mot de passe est fourni
+        if (admin.getPassWord() != null && !admin.getPassWord().isEmpty()) {
+            String hashedPassword = passwordEncoder.encode(admin.getPassWord());
+            admin1.setPassWord(hashedPassword);
+        }
         if(multipartFile != null){
             String location = "C:\\xampp\\htdocs\\cosit";
             try{
@@ -142,11 +151,21 @@ public class AdminService {
     }
 
     public Admin connection(String email, String passWord){
-         Admin admin= adminRepository.findByEmailAndAndPassWord(email, passWord);
-        if (admin == null) {
+         Admin admin= adminRepository.findByEmail(email);
+        if (admin == null || !passwordEncoder.matches(passWord, admin.getPassWord())) {
             throw new EntityNotFoundException("Ce compte n'existe pas");
         }
 
         return admin;
     }
+
+//    public Utilisateur connection(String email, String passWord) {
+//        Utilisateur user = utilisateurRepository.findByEmail(email);
+//
+//        if (user == null || !passwordEncoder.matches(passWord, user.getPassWord())) {
+//            throw new EntityNotFoundException("Combinaison e-mail/mot de passe incorrecte");
+//        }
+//
+//        return user;
+//    }
 }
