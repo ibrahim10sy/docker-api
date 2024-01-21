@@ -87,4 +87,11 @@ public List<Utilisateur> listUser(){
                             @RequestParam("passWord") String passWord) {
         return utilisateurService.connection(email, passWord);
     }
+
+    @PostMapping("/newPassWord")
+    @Operation(summary = "reunitialiser un mot de passe d'un utilisateur")
+    public Object reuinitialiser(@RequestParam("email") String email,
+                            @RequestParam("passWord") String passWord) {
+        return utilisateurService.reinitialiserMotDePasse(email,passWord);
+    }
 }

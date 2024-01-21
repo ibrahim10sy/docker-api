@@ -13,6 +13,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -76,6 +78,51 @@ public class UtilisateurService {
             throw new EntityExistsException("Cet compte existe déjà");
         }
     }
+
+//    public Utilisateur createUser(Utilisateur utilisateur, MultipartFile multipartFileImage) throws Exception {
+//        if (utilisateurRepository.findByEmail(utilisateur.getEmail()) == null) {
+//
+//            // On hashe le mot de passe
+//            String passWordHasher = passwordEncoder.encode(utilisateur.getPassWord());
+//            utilisateur.setPassWord(passWordHasher);
+//
+//            if (multipartFileImage != null) {
+//                try {
+//                    // Configuration du client S3
+//                    S3Client s3Client = S3Client.builder()
+//                            .region(Region.EU_NORTH_1)  // Utilisation de la région eu-north-1
+//                            .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
+//                            .build();
+//
+//                    // Nom du compartiment S3
+//                    String bucketName = "cositgestion";
+//
+//                    // Chemin dans le compartiment S3
+//                    String s3Key = "images/" + multipartFileImage.getOriginalFilename();
+//
+//                    // Téléchargement de l'image vers Amazon S3
+//                    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+//                            .bucket(bucketName)
+//                            .key(s3Key)
+//                            .build();
+//
+//                    InputStream inputStream = multipartFileImage.getInputStream();
+//                    s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(inputStream, multipartFileImage.getSize()));
+////                    https://cositgestion.s3.eu-north-1.amazonaws.com/IMG_3329.JPG
+//                    // Enregistrement du chemin de l'image dans la base de données
+//                    utilisateur.setImage("https://" + bucketName + ".s3." + Region.EU_NORTH_1.id() + ".amazonaws.com/" + s3Key);
+//                } catch (Exception e) {
+//                    throw new Exception("Impossible de télécharger l'image vers Amazon S3", e);
+//                }
+//            }
+//
+//            // Enregistrement de l'utilisateur dans la base de données
+//            return utilisateurRepository.save(utilisateur);
+//
+//        } else {
+//            throw new EntityExistsException("Cet compte existe déjà");
+//        }
+//    }
     public List<Utilisateur> lire(){
         List<Utilisateur> utilisateurList = utilisateurRepository.findAll();
 
@@ -193,5 +240,14 @@ public class UtilisateurService {
 
         return user;
     }
+    public Utilisateur reinitialiserMotDePasse(String email, String nouveauMotDePasse) {
+        Utilisateur utilisateur = utilisateurRepository.findByEmail(email);
 
+        if (utilisateur != null) {
+            // Mettre à jour le mot de passe dans la base de données
+            utilisateur.setPassWord(passwordEncoder.encode(nouveauMotDePasse));
+
+        }
+        return utilisateurRepository.save(utilisateur);
+    }
 }
