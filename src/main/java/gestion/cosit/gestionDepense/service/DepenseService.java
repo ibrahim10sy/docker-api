@@ -6,6 +6,7 @@ import gestion.cosit.gestionDepense.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,7 @@ import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,8 +46,10 @@ public class DepenseService {
     SendNotifRepository sendNotifRepository;
     @Autowired
     SendNotifService sendNotifService;
+    @Autowired
+    FileService fileService;
 
-    public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFile) throws Exception {
+    public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFileImage) throws Exception {
         Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(depense.getUtilisateur().getIdUtilisateur());
         SousCategorie sousCategorie = sousCategorieRepository.findByIdSousCategorie(depense.getSousCategorie().getIdSousCategorie());
         Budget budget = budgetRepository.findByIdBudget(depense.getBudget().getIdBudget());
@@ -60,37 +64,18 @@ public class DepenseService {
         if (utilisateur == null)
             throw new BadRequestException("Utilisateur invalid");
 
-        if(multipartFile != null){
-            String location = "C:\\xampp\\htdocs\\cosit";
-            try{
-                Path rootlocation = Paths.get(location);
-                if(!Files.exists(rootlocation)){
-                    Files.createDirectories(rootlocation);
-                    Files.copy(multipartFile.getInputStream(),
-                            rootlocation.resolve(multipartFile.getOriginalFilename()));
-                    depense.setImage("cosit/"
-                            +multipartFile.getOriginalFilename());
-                }else{
-                    try {
-                        String nom = location+"\\"+multipartFile.getOriginalFilename();
-                        Path name = Paths.get(nom);
-                        if(!Files.exists(name)){
-                            Files.copy(multipartFile.getInputStream(),
-                                    rootlocation.resolve(multipartFile.getOriginalFilename()));
-                            depense.setImage("cosit/"
-                                    +multipartFile.getOriginalFilename());
-                        }else{
-                            Files.delete(name);
-                            Files.copy(multipartFile.getInputStream(),rootlocation.resolve(multipartFile.getOriginalFilename()));
-                            depense.setImage("cosit/"
-                                    +multipartFile.getOriginalFilename());
-                        }
-                    }catch (Exception e){
-                        throw new Exception("Impossible de télécharger l\'image");
-                    }
-                }
-            } catch (Exception e){
-                throw new Exception(e.getMessage());
+        if (multipartFileImage != null) {
+            try {
+                // Générer un nom de fichier unique
+                String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFileImage.getOriginalFilename());
+
+                // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
+                ResponseEntity<String> uploadResponse = fileService.upload(multipartFileImage, fileName);
+
+                // Utiliser directement l'URL obtenue du téléversement dans Firebase Storage
+                depense.setImage(uploadResponse.getBody());
+            } catch (Exception e) {
+                throw new Exception("Impossible de télécharger l'image");
             }
         }
 
@@ -222,7 +207,7 @@ public class DepenseService {
 //        return depense;
 //    }
 
-    public Depense saveDepenseByAdmin(Depense depense , MultipartFile multipartFile) throws Exception {
+    public Depense saveDepenseByAdmin(Depense depense , MultipartFile multipartFileImage) throws Exception {
         Admin admin = adminRepository.findByIdAdmin(depense.getAdmin().getIdAdmin());
         Budget budget = budgetRepository.findByIdBudget(depense.getBudget().getIdBudget());
         SousCategorie sousCategorie = sousCategorieRepository.findByIdSousCategorie(depense.getSousCategorie().getIdSousCategorie());
@@ -236,37 +221,18 @@ public class DepenseService {
         if (admin == null)
             throw new BadRequestException("Admin invalid");
 
-        if(multipartFile != null){
-            String location = "C:\\xampp\\htdocs\\cosit";
-            try{
-                Path rootlocation = Paths.get(location);
-                if(!Files.exists(rootlocation)){
-                    Files.createDirectories(rootlocation);
-                    Files.copy(multipartFile.getInputStream(),
-                            rootlocation.resolve(multipartFile.getOriginalFilename()));
-                    depense.setImage("cosit/"
-                            +multipartFile.getOriginalFilename());
-                }else{
-                    try {
-                        String nom = location+"\\"+multipartFile.getOriginalFilename();
-                        Path name = Paths.get(nom);
-                        if(!Files.exists(name)){
-                            Files.copy(multipartFile.getInputStream(),
-                                    rootlocation.resolve(multipartFile.getOriginalFilename()));
-                            depense.setImage("cosit/"
-                                    +multipartFile.getOriginalFilename());
-                        }else{
-                            Files.delete(name);
-                            Files.copy(multipartFile.getInputStream(),rootlocation.resolve(multipartFile.getOriginalFilename()));
-                            depense.setImage("cosit/"
-                                    +multipartFile.getOriginalFilename());
-                        }
-                    }catch (Exception e){
-                        throw new Exception("Impossible de télécharger l\'image");
-                    }
-                }
-            } catch (Exception e){
-                throw new Exception(e.getMessage());
+        if (multipartFileImage != null) {
+            try {
+                // Générer un nom de fichier unique
+                String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFileImage.getOriginalFilename());
+
+                // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
+                ResponseEntity<String> uploadResponse = fileService.upload(multipartFileImage, fileName);
+
+                // Utiliser directement l'URL obtenue du téléversement dans Firebase Storage
+                depense.setImage(uploadResponse.getBody());
+            } catch (Exception e) {
+                throw new Exception("Impossible de télécharger l'image");
             }
         }
 

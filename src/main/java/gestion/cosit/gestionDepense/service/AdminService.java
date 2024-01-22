@@ -7,6 +7,7 @@ import gestion.cosit.gestionDepense.repository.AdminRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AdminService {
@@ -24,44 +26,27 @@ public class AdminService {
     private AdminRepository adminRepository;
     @Autowired
     BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    FileService fileService;
     //création de admin
 
-    public Admin createAdmin(Admin admin, MultipartFile multipartFile) throws Exception {
+    public Admin createAdmin(Admin admin, MultipartFile multipartFileImage) throws Exception {
         if(adminRepository.findByEmail(admin.getEmail()) == null){
 
             String passWordHasher = passwordEncoder.encode(admin.getPassWord());
             admin.setPassWord(passWordHasher);
-            if(multipartFile != null){
-                String location = "C:\\xampp\\htdocs\\cosit";
-                try{
-                    Path rootlocation = Paths.get(location);
-                    if(!Files.exists(rootlocation)){
-                        Files.createDirectories(rootlocation);
-                        Files.copy(multipartFile.getInputStream(),
-                                rootlocation.resolve(multipartFile.getOriginalFilename()));
-                        admin.setImage("cosit/"
-                                +multipartFile.getOriginalFilename());
-                    }else{
-                        try {
-                            String nom = location+"\\"+multipartFile.getOriginalFilename();
-                            Path name = Paths.get(nom);
-                            if(!Files.exists(name)){
-                                Files.copy(multipartFile.getInputStream(),
-                                        rootlocation.resolve(multipartFile.getOriginalFilename()));
-                                admin.setImage("cosit/"
-                                        +multipartFile.getOriginalFilename());
-                            }else{
-                                Files.delete(name);
-                                Files.copy(multipartFile.getInputStream(),rootlocation.resolve(multipartFile.getOriginalFilename()));
-                                admin.setImage("cosit/"
-                                        +multipartFile.getOriginalFilename());
-                            }
-                        }catch (Exception e){
-                            throw new Exception("Impossible de télécharger l\'image");
-                        }
-                    }
-                } catch (Exception e){
-                    throw new Exception(e.getMessage());
+            if (multipartFileImage != null) {
+                try {
+                    // Générer un nom de fichier unique
+                    String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFileImage.getOriginalFilename());
+
+                    // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
+                    ResponseEntity<String> uploadResponse = fileService.upload(multipartFileImage, fileName);
+
+                    // Utiliser directement l'URL obtenue du téléversement dans Firebase Storage
+                    admin.setImage(uploadResponse.getBody());
+                } catch (Exception e) {
+                    throw new Exception("Impossible de télécharger l'image");
                 }
             }
             return  adminRepository.save(admin);

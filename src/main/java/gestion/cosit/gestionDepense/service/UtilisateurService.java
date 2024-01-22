@@ -9,6 +9,7 @@ import gestion.cosit.gestionDepense.repository.UtilisateurRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,57 +30,83 @@ public class UtilisateurService {
     private UtilisateurRepository utilisateurRepository;
     @Autowired
     BCryptPasswordEncoder passwordEncoder;
-
+    @Autowired
+    FileService fileService;
     //Methode pour créer un user
 
-    public Utilisateur createUser(Utilisateur utilisateur, MultipartFile multipartFileImage) throws Exception {
-        if(utilisateurRepository.findByEmail(utilisateur.getEmail()) == null){
+//    public Utilisateur createUser(Utilisateur utilisateur, MultipartFile multipartFileImage) throws Exception {
+//        if(utilisateurRepository.findByEmail(utilisateur.getEmail()) == null){
+//
+//            //On hashe le mot de passe
+//            String passWordHasher = passwordEncoder.encode(utilisateur.getPassWord());
+//            utilisateur.setPassWord(passWordHasher);
+//            if (multipartFileImage != null) {
+//                String location = "C:\\xampp\\htdocs\\cosit";
+//                System.out.println("verif");
+//                try {
+//                    Path rootlocation = Paths.get(location);
+//                    if (!Files.exists(rootlocation)) {
+//                        Files.createDirectories(rootlocation);
+//                        Files.copy(multipartFileImage.getInputStream(),
+//                                rootlocation.resolve(multipartFileImage.getOriginalFilename()));
+//                        utilisateur.setImage("cosit/"
+//                                + multipartFileImage.getOriginalFilename());
+//                    } else {
+//                        System.out.println("Autre condition");
+//                        try {
+//                            String nom = location + "\\" + multipartFileImage.getOriginalFilename();
+//                            Path name = Paths.get(nom);
+//                            if (!Files.exists(name)) {
+//                                Files.copy(multipartFileImage.getInputStream(),
+//                                        rootlocation.resolve(multipartFileImage.getOriginalFilename()));
+//                                utilisateur.setImage("cosit/"
+//                                        + multipartFileImage.getOriginalFilename());
+//                            } else {
+//                                Files.delete(name);
+//                                Files.copy(multipartFileImage.getInputStream(), rootlocation.resolve(multipartFileImage.getOriginalFilename()));
+//                                utilisateur.setImage("cosit/"
+//                                        + multipartFileImage.getOriginalFilename());
+//                            }
+//                        } catch (Exception e) {
+//                            throw new Exception("Impossible de télécharger l\'image");
+//                        }
+//                    }
+//                } catch (Exception e) {
+//                    throw new Exception(e.getMessage());
+//                }
+//            }
+//            System.out.println("user service"+utilisateur);
+//            return  utilisateurRepository.save(utilisateur);
+//        }else{
+//            throw new EntityExistsException("Cet compte existe déjà");
+//        }
+//    }
+public Utilisateur createUser(Utilisateur utilisateur, MultipartFile multipartFileImage) throws Exception {
+    if(utilisateurRepository.findByEmail(utilisateur.getEmail()) == null){
 
-            //On hashe le mot de passe
-            String passWordHasher = passwordEncoder.encode(utilisateur.getPassWord());
-            utilisateur.setPassWord(passWordHasher);
-            if (multipartFileImage != null) {
-                String location = "C:\\xampp\\htdocs\\cosit";
-                System.out.println("verif");
-                try {
-                    Path rootlocation = Paths.get(location);
-                    if (!Files.exists(rootlocation)) {
-                        Files.createDirectories(rootlocation);
-                        Files.copy(multipartFileImage.getInputStream(),
-                                rootlocation.resolve(multipartFileImage.getOriginalFilename()));
-                        utilisateur.setImage("cosit/"
-                                + multipartFileImage.getOriginalFilename());
-                    } else {
-                        System.out.println("Autre condition");
-                        try {
-                            String nom = location + "\\" + multipartFileImage.getOriginalFilename();
-                            Path name = Paths.get(nom);
-                            if (!Files.exists(name)) {
-                                Files.copy(multipartFileImage.getInputStream(),
-                                        rootlocation.resolve(multipartFileImage.getOriginalFilename()));
-                                utilisateur.setImage("cosit/"
-                                        + multipartFileImage.getOriginalFilename());
-                            } else {
-                                Files.delete(name);
-                                Files.copy(multipartFileImage.getInputStream(), rootlocation.resolve(multipartFileImage.getOriginalFilename()));
-                                utilisateur.setImage("cosit/"
-                                        + multipartFileImage.getOriginalFilename());
-                            }
-                        } catch (Exception e) {
-                            throw new Exception("Impossible de télécharger l\'image");
-                        }
-                    }
-                } catch (Exception e) {
-                    throw new Exception(e.getMessage());
-                }
+        //On hashe le mot de passe
+        String passWordHasher = passwordEncoder.encode(utilisateur.getPassWord());
+        utilisateur.setPassWord(passWordHasher);
+        if (multipartFileImage != null) {
+            try {
+                // Générer un nom de fichier unique
+                String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFileImage.getOriginalFilename());
+
+                // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
+                ResponseEntity<String> uploadResponse = fileService.upload(multipartFileImage, fileName);
+
+                // Utiliser directement l'URL obtenue du téléversement dans Firebase Storage
+                utilisateur.setImage(uploadResponse.getBody());
+            } catch (Exception e) {
+                throw new Exception("Impossible de télécharger l'image");
             }
-            System.out.println("user service"+utilisateur);
-            return  utilisateurRepository.save(utilisateur);
-        }else{
-            throw new EntityExistsException("Cet compte existe déjà");
         }
+        System.out.println("user service"+utilisateur);
+        return  utilisateurRepository.save(utilisateur);
+    }else{
+        throw new EntityExistsException("Cet compte existe déjà");
     }
-
+}
 //    public Utilisateur createUser(Utilisateur utilisateur, MultipartFile multipartFileImage) throws Exception {
 //        if (utilisateurRepository.findByEmail(utilisateur.getEmail()) == null) {
 //
@@ -166,39 +194,22 @@ public class UtilisateurService {
             user.setPassWord(hashedPassword);
         }
 
-        if(multipartFile != null){
-            String location = "C:\\xampp\\htdocs\\cosit";
-            try{
-                Path rootlocation = Paths.get(location);
-                if(!Files.exists(rootlocation)){
-                    Files.createDirectories(rootlocation);
-                    Files.copy(multipartFile.getInputStream(),
-                            rootlocation.resolve(multipartFile.getOriginalFilename()));
-                    user.setImage("cosit/"
-                            +multipartFile.getOriginalFilename());
-                }else{
-                    try {
-                        String nom = location+"\\"+multipartFile.getOriginalFilename();
-                        Path name = Paths.get(nom);
-                        if(!Files.exists(name)){
-                            Files.copy(multipartFile.getInputStream(),
-                                    rootlocation.resolve(multipartFile.getOriginalFilename()));
-                            user.setImage("cosit/"
-                                    +multipartFile.getOriginalFilename());
-                        }else{
-                            Files.delete(name);
-                            Files.copy(multipartFile.getInputStream(),rootlocation.resolve(multipartFile.getOriginalFilename()));
-                            user.setImage("cosit/"
-                                    +multipartFile.getOriginalFilename());
-                        }
-                    }catch (Exception e){
-                        throw new Exception("Impossible de télécharger l\'image");
-                    }
-                }
-            } catch (Exception e){
-                throw new Exception(e.getMessage());
+        if (multipartFile != null) {
+            try {
+                // Générer un nom de fichier unique
+                String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFile.getOriginalFilename());
+
+                // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
+                ResponseEntity<String> uploadResponse = fileService.upload(multipartFile, fileName);
+
+                // Utiliser directement l'URL obtenue du téléversement dans Firebase Storage
+                user.setImage(uploadResponse.getBody());
+            } catch (Exception e) {
+                throw new Exception("Impossible de télécharger l'image");
             }
         }
+
+
         return  utilisateurRepository.save(user);
     }
 
