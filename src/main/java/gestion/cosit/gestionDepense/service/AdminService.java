@@ -49,6 +49,7 @@ public class AdminService {
                     throw new Exception("Impossible de télécharger l'image");
                 }
             }
+            System.out.println(admin.toString());
             return  adminRepository.save(admin);
         }else{
             throw new EntityExistsException("Cet compte existe déjà");

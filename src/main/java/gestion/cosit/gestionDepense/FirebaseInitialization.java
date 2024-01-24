@@ -16,7 +16,7 @@ public class FirebaseInitialization {
     public void initialization() throws IOException {
         FileInputStream serviceAccount = null;
         try {
-            serviceAccount = new FileInputStream("./serviceAccountKey.json");
+            serviceAccount = new FileInputStream("C:\\Users\\ibrah\\Desktop\\Projet SpringBoot\\gestionDepense\\serviceAccountKey.json");
 
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
