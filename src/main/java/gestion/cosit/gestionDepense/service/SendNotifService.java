@@ -35,7 +35,7 @@ public class SendNotifService {
     @Autowired
     private DepenseRepository depenseRepository;
 
-    @Value("ibrahim20000sy@gmail.com")
+    @Value("cosit162@gmail.com")
     String sender;
 
     public void sendDemande(Depense depense) throws BadRequestException {

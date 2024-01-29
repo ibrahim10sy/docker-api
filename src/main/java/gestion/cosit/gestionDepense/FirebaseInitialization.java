@@ -3,6 +3,7 @@ package gestion.cosit.gestionDepense;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -14,9 +15,11 @@ public class FirebaseInitialization {
 
     @PostConstruct
     public void initialization() throws IOException {
-        FileInputStream serviceAccount = null;
+//        FileInputStream serviceAccount = null;
         try {
-            serviceAccount = new FileInputStream("C:\\Users\\ibrah\\Desktop\\Projet SpringBoot\\gestionDepense\\serviceAccountKey.json");
+//            serviceAccount = new FileInputStream("./serviceAccountKey.json");
+            ClassPathResource resource = new ClassPathResource("serviceAccountKey.json");
+            FileInputStream serviceAccount = new FileInputStream(resource.getFile());
 
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
