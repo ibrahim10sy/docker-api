@@ -49,7 +49,7 @@ public class SendNotifService {
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
 
-        msg = "Bonjour M/Mme "+ admin.getNom().toUpperCase()  + " " + admin.getPrenom().toUpperCase()  + ".\n Vous avez reçus une nouvelle demande de la part de  Mr" + utilisateur.getNom().toUpperCase()  + " "+ utilisateur.getPrenom().toUpperCase() ;
+        msg = "Bonjour M/Mme "+ admin.getNom().toUpperCase()  + " " + admin.getPrenom().toUpperCase()  + ".\n Vous avez reçus une nouvelle demande de la part de  Mr " + utilisateur.getNom().toUpperCase()  + " "+ utilisateur.getPrenom().toUpperCase() ;
 
         try {
             // Sauvegarder l'entité Demande d'abord
