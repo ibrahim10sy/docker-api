@@ -79,78 +79,148 @@ public class DepenseService {
         }
     }
 
-    public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFileImage) throws Exception {
-        Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(depense.getUtilisateur().getIdUtilisateur());
-        SousCategorie sousCategorie = sousCategorieRepository.findByIdSousCategorie(depense.getSousCategorie().getIdSousCategorie());
-        Budget budget = budgetRepository.findByIdBudget(depense.getBudget().getIdBudget());
-        ParametreDepense parametreDepense = parametreDepenseRepository.findByIdParametre(depense.getParametreDepense().getIdParametre());
+//    public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFileImage) throws Exception {
+//        Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(depense.getUtilisateur().getIdUtilisateur());
+//        SousCategorie sousCategorie = sousCategorieRepository.findByIdSousCategorie(depense.getSousCategorie().getIdSousCategorie());
+//        Budget budget = budgetRepository.findByIdBudget(depense.getBudget().getIdBudget());
+//        ParametreDepense parametreDepense = parametreDepenseRepository.findByIdParametre(depense.getParametreDepense().getIdParametre());
+//
+//        if(budget == null)
+//            throw new BadRequestException("Desolé ce budget n'existe pas");
+//
+//        if(sousCategorie == null)
+//            throw new BadRequestException("Desolé cette catégorie n'existe pas");
+//
+//        if (utilisateur == null)
+//            throw new BadRequestException("Utilisateur invalid");
+//
+//        if (multipartFileImage != null) {
+//            // Appeler la méthode uploaderImage de manière asynchrone
+//            CompletableFuture<String> uploadTask = uploaderImageAsync(depense, multipartFileImage);
+//
+//            // Attendre la fin de la tâche asynchrone avant de continuer
+//            uploadTask.join();
+//        }
+//
+//        if (depense.getMontantDepense() > budget.getMontantRestant()) {
+//            throw new BadRequestException("Le montant de la dépense ne doit pas être supérieur à celui du montant restant du budget " );
+//        } else if (budget.getMontantRestant() == 0) {
+//            throw new BadRequestException("Le  montant restant du budget est atteint" );
+//
+//        }
+//        if (depense.getMontantDepense() >= depense.getParametreDepense().getMontantSeuil()) {
+//            // Montant supérieur ou égal au seuil, envoie de notification
+//            try {
+//                System.out.println("Debut de l'envoi dans le service demande");
+//                sendNotifService.sendDemande(depense);
+//            } catch (BadRequestException e) {
+//                throw new RuntimeException(e);
+//            }
+//            System.out.println("Fin de l'envoi dans le service demande");
+//
+//            // Ne pas ajouter la dépense immédiatement, attendre la validation de l'administrateur
+//            depense.setAutorisationAdmin(false);
+//
+//            // Enregistrement initial avec la dépense non validée
+//            depense = depenseRepository.save(depense);
+//
+//        } else {
+//            // Montant inférieur au seuil, la dépense peut être enregistrée directement
+//            // Mettre à jour le montant restant du budget
+//            budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
+//            depense.setViewed(false);
+//
+//            // Marquer la dépense comme validée car elle n'a pas besoin de validation administrative
+//            depense.setAutorisationAdmin(true);
+//
+//            // Enregistrer la dépense mise à jour
+//            depense = depenseRepository.save(depense);
+//
+//            try {
+//                System.out.println("Debut de l'envoi dans le service demande dans else");
+//                sendNotifService.sendDepense(depense);
+//            } catch (BadRequestException e) {
+//                throw new RuntimeException(e);
+//            }
+//            System.out.println("Fin de l'envoi dans le service demande else");
+//        }
+//
+//        // Mettre à jour le montant restant du budget
+//        budgetRepository.save(budget);
+//
+//        return depense;
+//    }
+public Depense saveDepenseByUser(Depense depense, MultipartFile multipartFileImage) throws Exception {
+    Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(depense.getUtilisateur().getIdUtilisateur());
+    SousCategorie sousCategorie = sousCategorieRepository.findByIdSousCategorie(depense.getSousCategorie().getIdSousCategorie());
+    Budget budget = budgetRepository.findByIdBudget(depense.getBudget().getIdBudget());
+    ParametreDepense parametreDepense = parametreDepenseRepository.findByIdParametre(depense.getParametreDepense().getIdParametre());
 
-        if(budget == null)
-            throw new BadRequestException("Desolé ce budget n'existe pas");
+    if(budget == null)
+        throw new BadRequestException("Désolé ce budget n'existe pas");
 
-        if(sousCategorie == null)
-            throw new BadRequestException("Desolé cette catégorie n'existe pas");
+    if(sousCategorie == null)
+        throw new BadRequestException("Désolé cette catégorie n'existe pas");
 
-        if (utilisateur == null)
-            throw new BadRequestException("Utilisateur invalid");
+    if (utilisateur == null)
+        throw new BadRequestException("Utilisateur invalide");
 
-        if (multipartFileImage != null) {
-            // Appeler la méthode uploaderImage de manière asynchrone
-            CompletableFuture<String> uploadTask = uploaderImageAsync(depense, multipartFileImage);
-
-            // Attendre la fin de la tâche asynchrone avant de continuer
-            uploadTask.join();
-        }
-
-        if (depense.getMontantDepense() > budget.getMontantRestant()) {
-            throw new BadRequestException("Le montant de la dépense ne doit pas être supérieur à celui du montant restant du budget " );
-        } else if (budget.getMontantRestant() == 0) {
-            throw new BadRequestException("Le  montant restant du budget est atteint" );
-
-        }
-        if (depense.getMontantDepense() >= depense.getParametreDepense().getMontantSeuil()) {
-            // Montant supérieur ou égal au seuil, envoie de notification
-            try {
-                System.out.println("Debut de l'envoi dans le service demande");
-                sendNotifService.sendDemande(depense);
-            } catch (BadRequestException e) {
-                throw new RuntimeException(e);
+    final Depense finalDepense = depense;
+    CompletableFuture<Void> uploadTask = CompletableFuture.runAsync(() -> {
+        try {
+            if (multipartFileImage != null) {
+                // Appeler la méthode uploaderImage de manière asynchrone
+                uploaderImageAsync(finalDepense, multipartFileImage).join();
             }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    });
+
+    if (depense.getMontantDepense() > budget.getMontantRestant()) {
+        throw new BadRequestException("Le montant de la dépense ne doit pas être supérieur à celui du montant restant du budget " );
+    } else if (budget.getMontantRestant() == 0) {
+        throw new BadRequestException("Le montant restant du budget est atteint" );
+    }
+
+    CompletableFuture<Void> sendNotifTask = CompletableFuture.runAsync(() -> {
+        if (finalDepense.getMontantDepense() >= finalDepense.getParametreDepense().getMontantSeuil()) {
+            // Montant supérieur ou égal au seuil, envoie de notification
+            System.out.println("Debut de l'envoi dans le service demande");
+            sendNotifService.sendDemandeAsync(finalDepense);
             System.out.println("Fin de l'envoi dans le service demande");
 
             // Ne pas ajouter la dépense immédiatement, attendre la validation de l'administrateur
-            depense.setAutorisationAdmin(false);
+            finalDepense.setAutorisationAdmin(false);
 
             // Enregistrement initial avec la dépense non validée
-            depense = depenseRepository.save(depense);
-
+            depenseRepository.save(depense);
         } else {
             // Montant inférieur au seuil, la dépense peut être enregistrée directement
             // Mettre à jour le montant restant du budget
-            budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
-            depense.setViewed(false);
+            budget.setMontantRestant(budget.getMontantRestant() - finalDepense.getMontantDepense());
+            finalDepense.setViewed(false);
 
             // Marquer la dépense comme validée car elle n'a pas besoin de validation administrative
-            depense.setAutorisationAdmin(true);
+            finalDepense.setAutorisationAdmin(true);
 
             // Enregistrer la dépense mise à jour
-            depense = depenseRepository.save(depense);
+             depenseRepository.save(depense);
 
-            try {
-                System.out.println("Debut de l'envoi dans le service demande dans else");
-                sendNotifService.sendDepense(depense);
-            } catch (BadRequestException e) {
-                throw new RuntimeException(e);
-            }
+            System.out.println("Debut de l'envoi dans le service demande dans else");
+            sendNotifService.sendDepenseAsync(depense);
             System.out.println("Fin de l'envoi dans le service demande else");
         }
 
         // Mettre à jour le montant restant du budget
         budgetRepository.save(budget);
+    });
 
-        return depense;
-    }
+    // Attendre que les deux tâches soient terminées
+    CompletableFuture.allOf(uploadTask, sendNotifTask).join();
 
+    return depense;
+}
     @Transactional
     public Depense validateDepenseByAdmin(Long depenseId) throws Exception {
         try {
