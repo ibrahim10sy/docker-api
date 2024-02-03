@@ -52,15 +52,15 @@ public class DepenseService {
     @Autowired
     FileService fileService;
 
-    private static final String UPLOAD_DIRECTORY = "src/main/resources/images";
+//    private static final String UPLOAD_DIRECTORY = "src/main/resources/images";
     @Async("asyncExecutor")
     public CompletableFuture<String> uploaderImageAsync(Depense depense, MultipartFile multipartFileImage) {
         try {
             // Générer un nom de fichier unique
             String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFileImage.getOriginalFilename());
 
-            Path uploadPath = Paths.get(UPLOAD_DIRECTORY);
-            Path filePath = uploadPath.resolve(fileName);
+//            String imageUploadDirectory = "uploads"; // Chemin relatif dans le répertoire du projet
+//            Path imageRootLocation = Paths.get(imageUploadDirectory);
 
             // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
             ResponseEntity<String> uploadResponse = fileService.upload(multipartFileImage, fileName);
