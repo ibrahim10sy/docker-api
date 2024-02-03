@@ -25,7 +25,7 @@ public class AdminController {
     @PostMapping("/create")
     @Operation(summary = "Création de compte admin")
     public ResponseEntity<Admin> createAdmin(@Valid @RequestParam("admin") String adminString,
-                                             @RequestParam(value = "image", required = false) MultipartFile multipartFile) throws Exception {
+                                             @RequestParam(value = "images", required = false) MultipartFile multipartFile) throws Exception {
 
         Admin admin = new Admin();
         try{
@@ -40,7 +40,7 @@ public class AdminController {
     @PutMapping("update/{id}")
     @Operation(summary = "Mise à jour")
     public ResponseEntity<Admin> updateAdmin(@PathVariable Long id,@Valid @RequestParam("admin") String adminString,
-                                             @RequestParam(value = "image", required = false) MultipartFile multipartFile) throws Exception {
+                                             @RequestParam(value = "images", required = false) MultipartFile multipartFile) throws Exception {
         Admin admin = new Admin();
         try{
             admin = new JsonMapper().readValue(adminString,Admin.class);

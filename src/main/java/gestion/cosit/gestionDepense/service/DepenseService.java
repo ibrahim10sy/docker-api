@@ -7,11 +7,13 @@ import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.webjars.NotFoundException;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,6 +23,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,6 +52,33 @@ public class DepenseService {
     @Autowired
     FileService fileService;
 
+    private static final String UPLOAD_DIRECTORY = "src/main/resources/images";
+    @Async("asyncExecutor")
+    public CompletableFuture<String> uploaderImageAsync(Depense depense, MultipartFile multipartFileImage) {
+        try {
+            // Générer un nom de fichier unique
+            String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFileImage.getOriginalFilename());
+
+            Path uploadPath = Paths.get(UPLOAD_DIRECTORY);
+            Path filePath = uploadPath.resolve(fileName);
+
+            // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
+            ResponseEntity<String> uploadResponse = fileService.upload(multipartFileImage, fileName);
+
+            // Utiliser directement l'URL obtenue du téléversement dans Firebase Storage
+            String imageUrl = uploadResponse.getBody();
+
+            // Stocker l'URL de l'image dans l'objet depense
+            depense.setImage(imageUrl);
+
+            return CompletableFuture.completedFuture(imageUrl);
+        } catch (Exception e) {
+            // Gérer l'exception, par exemple en journalisant l'erreur
+            e.printStackTrace();
+            return CompletableFuture.failedFuture(e);
+        }
+    }
+
     public Depense saveDepenseByUser(Depense depense , MultipartFile multipartFileImage) throws Exception {
         Utilisateur utilisateur = utilisateurRepository.findByIdUtilisateur(depense.getUtilisateur().getIdUtilisateur());
         SousCategorie sousCategorie = sousCategorieRepository.findByIdSousCategorie(depense.getSousCategorie().getIdSousCategorie());
@@ -65,18 +95,11 @@ public class DepenseService {
             throw new BadRequestException("Utilisateur invalid");
 
         if (multipartFileImage != null) {
-            try {
-                // Générer un nom de fichier unique
-                String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFileImage.getOriginalFilename());
+            // Appeler la méthode uploaderImage de manière asynchrone
+            CompletableFuture<String> uploadTask = uploaderImageAsync(depense, multipartFileImage);
 
-                // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
-                ResponseEntity<String> uploadResponse = fileService.upload(multipartFileImage, fileName);
-
-                // Utiliser directement l'URL obtenue du téléversement dans Firebase Storage
-                depense.setImage(uploadResponse.getBody());
-            } catch (Exception e) {
-                throw new Exception("Impossible de télécharger l'image");
-            }
+            // Attendre la fin de la tâche asynchrone avant de continuer
+            uploadTask.join();
         }
 
         if (depense.getMontantDepense() > budget.getMontantRestant()) {
@@ -127,34 +150,7 @@ public class DepenseService {
 
         return depense;
     }
-    // Méthode permettant de  valider la dépense par l'administrateur
-//    public Depense validateDepenseByAdmin(Long depenseId) throws Exception {
-//        Depense depense = depenseRepository.findById(depenseId)
-//                .orElseThrow(() -> new NotFoundException("Dépense non trouvée"));
-//        Budget budget = depense.getBudget();
-//        try {
-//            System.out.println("Debut de l'envoi de validation");
-//            sendNotifService.approuverDemandeByAdmin(depense);
-//        } catch (BadRequestException e) {
-//            throw new RuntimeException(e);
-//        }
-//        System.out.println("Fin de l'envoi de validation");
-//
-//        // Valider la dépense
-//        depense.setAutorisationAdmin(true);
-//
-//        if (depense.getMontantDepense() > budget.getMontantRestant()) {
-//            throw new BadRequestException("Le montant de la dépense ne doit pas être supérieur à celui du montant restant du budget " );
-//        } else if (budget.getMontantRestant() == 0) {
-//            throw new BadRequestException("Le  montant restant du budget est atteint" );
-//
-//        }
-//        budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
-//        // Mettre à jour le montant restant du budget
-//        budgetRepository.save(budget);
-//        // Enregistrement la dépense validée
-//        return depenseRepository.save(depense);
-//    }
+
     @Transactional
     public Depense validateDepenseByAdmin(Long depenseId) throws Exception {
         try {
@@ -178,34 +174,7 @@ public class DepenseService {
             throw new Exception("Erreur lors de l'approbation de la demande : " + e.getMessage());
         }
     }
-//    public Depense validateDepenseByAdmin(Long depenseId) throws Exception {
-//        Depense depense = depenseRepository.findById(depenseId)
-//                .orElseThrow(() -> new NotFoundException("Dépense non trouvée"));
-//        Budget budget = depense.getBudget();
-//        // Valider la dépense
-//        depense.setAutorisationAdmin(true);
-//        if (depense.getMontantDepense() > budget.getMontantRestant()) {
-//            throw new BadRequestException("Le montant de la dépense ne doit pas être supérieur à celui du montant restant du budget " );
-//        } else if (budget.getMontantRestant() == 0) {
-//            throw new BadRequestException("Le  montant restant du budget est atteint" );
-//
-//        }
-//        try {
-//            // Approuver la depense en sauvegardant les modifications
-//            depenseRepository.save(depense);
-//
-//            // Envoyer la notification par e-mail
-//            sendNotifService.approuverDemandeByAdmin(depense);
-//        } catch (Exception e) {
-//            throw new Exception("Erreur lors de l'approbation de la demande : " + e.getMessage());
-//        }
-//        System.out.println("Fin de l'envoi de validation");
-//        budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
-//        // Mettre à jour le montant restant du budget
-//        budgetRepository.save(budget);
-//
-//        return depense;
-//    }
+
 
     public Depense saveDepenseByAdmin(Depense depense , MultipartFile multipartFileImage) throws Exception {
         Admin admin = adminRepository.findByIdAdmin(depense.getAdmin().getIdAdmin());
@@ -222,18 +191,11 @@ public class DepenseService {
             throw new BadRequestException("Admin invalid");
 
         if (multipartFileImage != null) {
-            try {
-                // Générer un nom de fichier unique
-                String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFileImage.getOriginalFilename());
+            // Appeler la méthode uploaderImage de manière asynchrone
+            CompletableFuture<String> uploadTask = uploaderImageAsync(depense, multipartFileImage);
 
-                // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
-                ResponseEntity<String> uploadResponse = fileService.upload(multipartFileImage, fileName);
-
-                // Utiliser directement l'URL obtenue du téléversement dans Firebase Storage
-                depense.setImage(uploadResponse.getBody());
-            } catch (Exception e) {
-                throw new Exception("Impossible de télécharger l'image");
-            }
+            // Attendre la fin de la tâche asynchrone avant de continuer
+            uploadTask.join();
         }
 
         if (depense.getMontantDepense() > budget.getMontantRestant()) {
@@ -258,45 +220,19 @@ public class DepenseService {
         isDepenseExist.setViewed(true);
         return depenseRepository.save(isDepenseExist);
     }
-    public Depense updateDepense(Depense depense, long id, MultipartFile multipartFile) throws Exception {
+    public Depense updateDepense(Depense depense, long id, MultipartFile multipartFileImage) throws Exception {
         Depense isDepenseExist = depenseRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Depense non trouvé"));
 
 //        isDepenseExist.setLibelle(depense.getLibelle());
         isDepenseExist.setDateDepense(depense.getDateDepense());
         isDepenseExist.setDescription(depense.getDescription());
         isDepenseExist.setMontantDepense(depense.getMontantDepense());
-        if(multipartFile != null){
-            String location = "C:\\xampp\\htdocs\\cosit";
-            try{
-                Path rootlocation = Paths.get(location);
-                if(!Files.exists(rootlocation)){
-                    Files.createDirectories(rootlocation);
-                    Files.copy(multipartFile.getInputStream(),
-                            rootlocation.resolve(multipartFile.getOriginalFilename()));
-                    isDepenseExist.setImage("cosit/"
-                            +multipartFile.getOriginalFilename());
-                }else{
-                    try {
-                        String nom = location+"\\"+multipartFile.getOriginalFilename();
-                        Path name = Paths.get(nom);
-                        if(!Files.exists(name)){
-                            Files.copy(multipartFile.getInputStream(),
-                                    rootlocation.resolve(multipartFile.getOriginalFilename()));
-                            isDepenseExist.setImage("cosit/"
-                                    +multipartFile.getOriginalFilename());
-                        }else{
-                            Files.delete(name);
-                            Files.copy(multipartFile.getInputStream(),rootlocation.resolve(multipartFile.getOriginalFilename()));
-                            isDepenseExist.setImage("cosit/"
-                                    +multipartFile.getOriginalFilename());
-                        }
-                    }catch (Exception e){
-                        throw new Exception("Impossible de télécharger l\'image");
-                    }
-                }
-            } catch (Exception e){
-                throw new Exception(e.getMessage());
-            }
+        if (multipartFileImage != null) {
+            // Appeler la méthode uploaderImage de manière asynchrone
+            CompletableFuture<String> uploadTask = uploaderImageAsync(depense, multipartFileImage);
+
+            // Attendre la fin de la tâche asynchrone avant de continuer
+            uploadTask.join();
         }
         return depenseRepository.save(isDepenseExist);
     }

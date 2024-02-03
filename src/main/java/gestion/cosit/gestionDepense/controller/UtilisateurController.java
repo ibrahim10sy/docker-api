@@ -10,6 +10,7 @@ import gestion.cosit.gestionDepense.service.UtilisateurService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,11 +27,14 @@ public class UtilisateurController {
     private UtilisateurService utilisateurService;
 
 
+
+
+
     @PostMapping("/create")
     @Operation(summary = "Création d'un utilisateur")
     public ResponseEntity<Utilisateur> createUtilisateur(
             @Valid @RequestParam("utilisateur") String utilisateurString,
-            @RequestParam(value ="images", required=false) MultipartFile multipartFile) throws Exception {
+            @RequestPart(value = "images", required = false) MultipartFile multipartFile) throws Exception {
 
         Utilisateur utilisateur = new Utilisateur();
         try{
@@ -47,7 +51,7 @@ public class UtilisateurController {
     @PutMapping("update/{id}")
     @Operation(summary = "Mise à jour d'un utilisateur")
     public ResponseEntity<Utilisateur> updateUser( @PathVariable Long id,@Valid @RequestParam("utilisateur") String utilisateurString,
-                                                   @RequestParam(value ="image", required=false) MultipartFile multipartFile) throws Exception{
+                                                   @RequestParam(value ="images", required=false) MultipartFile multipartFile) throws Exception{
         Utilisateur utilisateur = new Utilisateur();
         try {
             utilisateur = new JsonMapper().readValue(utilisateurString, Utilisateur.class);

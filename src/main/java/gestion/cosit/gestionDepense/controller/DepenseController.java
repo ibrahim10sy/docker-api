@@ -30,7 +30,7 @@ public class DepenseController {
     @Operation(summary = "création de dépense")
     public ResponseEntity<Depense> createDepenseByUser(
             @Valid @RequestParam("depense") String depenses,
-            @RequestParam(value = "images" , required = false) MultipartFile multipartFile
+            @RequestPart(value = "images", required = false) MultipartFile multipartFile
     ) throws Exception {
         Depense depense1 = new Depense();
         try {
@@ -46,7 +46,7 @@ public class DepenseController {
     @Operation(summary = "création de dépense")
     public ResponseEntity<Depense> createDepense(
             @Valid @RequestParam("depense") String depenses,
-            @RequestParam(value = "images" , required = false) MultipartFile multipartFile
+            @RequestPart(value = "images", required = false)  MultipartFile multipartFile
             ) throws Exception {
         Depense depense1 = new Depense();
         try {
@@ -64,7 +64,7 @@ public class DepenseController {
     public ResponseEntity<Depense> updateDepense(
             @Valid @RequestParam("depense") String depenses,
             @PathVariable long id,
-            @RequestParam(value = "images" , required = false) MultipartFile multipartFile
+            @RequestPart(value = "images", required = false)  MultipartFile multipartFile
     ) throws Exception {
         Depense depense1 = new Depense();
         try {

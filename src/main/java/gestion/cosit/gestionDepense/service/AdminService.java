@@ -8,6 +8,7 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class AdminService {
@@ -30,24 +32,43 @@ public class AdminService {
     FileService fileService;
     //création de admin
 
+    private static final String UPLOAD_DIRECTORY = "src/main/resources/images";
+    @Async("asyncExecutor")
+    public CompletableFuture<String> uploaderImageAsync(Admin admin, MultipartFile multipartFileImage) {
+        try {
+            // Générer un nom de fichier unique
+            String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFileImage.getOriginalFilename());
+
+            Path uploadPath = Paths.get(UPLOAD_DIRECTORY);
+            Path filePath = uploadPath.resolve(fileName);
+
+            // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
+            ResponseEntity<String> uploadResponse = fileService.upload(multipartFileImage, fileName);
+
+            // Utiliser directement l'URL obtenue du téléversement dans Firebase Storage
+            String imageUrl = uploadResponse.getBody();
+
+            // Stocker l'URL de l'image dans l'objet Utilisateur
+            admin.setImage(imageUrl);
+
+            return CompletableFuture.completedFuture(imageUrl);
+        } catch (Exception e) {
+            // Gérer l'exception, par exemple en journalisant l'erreur
+            e.printStackTrace();
+            return CompletableFuture.failedFuture(e);
+        }
+    }
     public Admin createAdmin(Admin admin, MultipartFile multipartFileImage) throws Exception {
         if(adminRepository.findByEmail(admin.getEmail()) == null){
 
             String passWordHasher = passwordEncoder.encode(admin.getPassWord());
             admin.setPassWord(passWordHasher);
             if (multipartFileImage != null) {
-                try {
-                    // Générer un nom de fichier unique
-                    String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFileImage.getOriginalFilename());
+                // Appeler la méthode uploaderImage de manière asynchrone
+                CompletableFuture<String> uploadTask = uploaderImageAsync(admin, multipartFileImage);
 
-                    // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
-                    ResponseEntity<String> uploadResponse = fileService.upload(multipartFileImage, fileName);
-
-                    // Utiliser directement l'URL obtenue du téléversement dans Firebase Storage
-                    admin.setImage(uploadResponse.getBody());
-                } catch (Exception e) {
-                    throw new Exception("Impossible de télécharger l'image");
-                }
+                // Attendre la fin de la tâche asynchrone avant de continuer
+                uploadTask.join();
             }
             System.out.println(admin.toString());
             return  adminRepository.save(admin);
@@ -72,7 +93,7 @@ public class AdminService {
         return admin;
     }
 
-    public Admin updateAdmin(Admin admin, long id, MultipartFile multipartFile) throws Exception {
+    public Admin updateAdmin(Admin admin, long id, MultipartFile multipartFileImage) throws Exception {
         Admin admin1 = adminRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("utilisateur non trouvé"));
 
         admin1.setNom(admin.getNom());
@@ -84,38 +105,12 @@ public class AdminService {
             String hashedPassword = passwordEncoder.encode(admin.getPassWord());
             admin1.setPassWord(hashedPassword);
         }
-        if(multipartFile != null){
-            String location = "C:\\xampp\\htdocs\\cosit";
-            try{
-                Path rootlocation = Paths.get(location);
-                if(!Files.exists(rootlocation)){
-                    Files.createDirectories(rootlocation);
-                    Files.copy(multipartFile.getInputStream(),
-                            rootlocation.resolve(multipartFile.getOriginalFilename()));
-                    admin1.setImage("cosit/"
-                            +multipartFile.getOriginalFilename());
-                }else{
-                    try {
-                        String nom = location+"\\"+multipartFile.getOriginalFilename();
-                        Path name = Paths.get(nom);
-                        if(!Files.exists(name)){
-                            Files.copy(multipartFile.getInputStream(),
-                                    rootlocation.resolve(multipartFile.getOriginalFilename()));
-                            admin1.setImage("cosit/"
-                                    +multipartFile.getOriginalFilename());
-                        }else{
-                            Files.delete(name);
-                            Files.copy(multipartFile.getInputStream(),rootlocation.resolve(multipartFile.getOriginalFilename()));
-                            admin1.setImage("cosit/"
-                                    +multipartFile.getOriginalFilename());
-                        }
-                    }catch (Exception e){
-                        throw new Exception("Impossible de télécharger l\'image");
-                    }
-                }
-            } catch (Exception e){
-                throw new Exception(e.getMessage());
-            }
+        if (multipartFileImage != null) {
+            // Appeler la méthode uploaderImage de manière asynchrone
+            CompletableFuture<String> uploadTask = uploaderImageAsync(admin, multipartFileImage);
+
+            // Attendre la fin de la tâche asynchrone avant de continuer
+            uploadTask.join();
         }
         return adminRepository.save(admin1);
     }

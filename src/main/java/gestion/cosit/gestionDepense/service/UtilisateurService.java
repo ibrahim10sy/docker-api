@@ -10,6 +10,7 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,7 +34,7 @@ public class UtilisateurService {
     BCryptPasswordEncoder passwordEncoder;
     @Autowired
     FileService fileService;
-    //Methode pour créer un user
+
 
 //    public Utilisateur createUser(Utilisateur utilisateur, MultipartFile multipartFileImage) throws Exception {
 //        if(utilisateurRepository.findByEmail(utilisateur.getEmail()) == null){
@@ -81,32 +83,54 @@ public class UtilisateurService {
 //            throw new EntityExistsException("Cet compte existe déjà");
 //        }
 //    }
-public Utilisateur createUser(Utilisateur utilisateur, MultipartFile multipartFileImage) throws Exception {
-    if(utilisateurRepository.findByEmail(utilisateur.getEmail()) == null){
+    private static final String UPLOAD_DIRECTORY = "src/main/resources/images";
+@Async("asyncExecutor")
+public CompletableFuture<String> uploaderImageAsync(Utilisateur utilisateur, MultipartFile multipartFileImage) {
+    try {
+        // Générer un nom de fichier unique
+        String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFileImage.getOriginalFilename());
 
-        //On hashe le mot de passe
-        String passWordHasher = passwordEncoder.encode(utilisateur.getPassWord());
-        utilisateur.setPassWord(passWordHasher);
-        if (multipartFileImage != null) {
-            try {
-                // Générer un nom de fichier unique
-                String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFileImage.getOriginalFilename());
+        Path uploadPath = Paths.get(UPLOAD_DIRECTORY);
+        Path filePath = uploadPath.resolve(fileName);
 
-                // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
-                ResponseEntity<String> uploadResponse = fileService.upload(multipartFileImage, fileName);
+        // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
+        ResponseEntity<String> uploadResponse = fileService.upload(multipartFileImage, fileName);
 
-                // Utiliser directement l'URL obtenue du téléversement dans Firebase Storage
-                utilisateur.setImage(uploadResponse.getBody());
-            } catch (Exception e) {
-                throw new Exception("Impossible de télécharger l'image");
-            }
-        }
-        System.out.println("user service"+utilisateur);
-        return  utilisateurRepository.save(utilisateur);
-    }else{
-        throw new EntityExistsException("Cet compte existe déjà");
+        // Utiliser directement l'URL obtenue du téléversement dans Firebase Storage
+        String imageUrl = uploadResponse.getBody();
+
+        // Stocker l'URL de l'image dans l'objet Utilisateur
+        utilisateur.setImage(imageUrl);
+
+        return CompletableFuture.completedFuture(imageUrl);
+    } catch (Exception e) {
+        // Gérer l'exception, par exemple en journalisant l'erreur
+        e.printStackTrace();
+        return CompletableFuture.failedFuture(e);
     }
 }
+
+    public Utilisateur createUser(Utilisateur utilisateur, MultipartFile multipartFileImage) throws Exception {
+        if (utilisateurRepository.findByEmail(utilisateur.getEmail()) == null) {
+            // On hashe le mot de passe
+            String passWordHasher = passwordEncoder.encode(utilisateur.getPassWord());
+            utilisateur.setPassWord(passWordHasher);
+
+            if (multipartFileImage != null) {
+                // Appeler la méthode uploaderImage de manière asynchrone
+                CompletableFuture<String> uploadTask = uploaderImageAsync(utilisateur, multipartFileImage);
+
+                // Attendre la fin de la tâche asynchrone avant de continuer
+                uploadTask.join();
+            }
+
+            System.out.println("user service" + utilisateur);
+            return utilisateurRepository.save(utilisateur);
+        } else {
+            throw new EntityExistsException("Ce compte existe déjà");
+        }
+    }
+
 //    public Utilisateur createUser(Utilisateur utilisateur, MultipartFile multipartFileImage) throws Exception {
 //        if (utilisateurRepository.findByEmail(utilisateur.getEmail()) == null) {
 //
@@ -173,7 +197,7 @@ public Utilisateur createUser(Utilisateur utilisateur, MultipartFile multipartFi
 
     //Methode permettant d'éditer un user
 
-    public Utilisateur updateUtilisateur(Utilisateur utilisateur, long id, MultipartFile multipartFile) throws Exception {
+    public Utilisateur updateUtilisateur(Utilisateur utilisateur, long id, MultipartFile multipartFileImage) throws Exception {
         Utilisateur user = utilisateurRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("utilisateur introuvable avec id :" +id));
 
@@ -194,21 +218,13 @@ public Utilisateur createUser(Utilisateur utilisateur, MultipartFile multipartFi
             user.setPassWord(hashedPassword);
         }
 
-        if (multipartFile != null) {
-            try {
-                // Générer un nom de fichier unique
-                String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFile.getOriginalFilename());
+        if (multipartFileImage != null) {
+            // Appeler la méthode uploaderImage de manière asynchrone
+            CompletableFuture<String> uploadTask = uploaderImageAsync(utilisateur, multipartFileImage);
 
-                // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
-                ResponseEntity<String> uploadResponse = fileService.upload(multipartFile, fileName);
-
-                // Utiliser directement l'URL obtenue du téléversement dans Firebase Storage
-                user.setImage(uploadResponse.getBody());
-            } catch (Exception e) {
-                throw new Exception("Impossible de télécharger l'image");
-            }
+            // Attendre la fin de la tâche asynchrone avant de continuer
+            uploadTask.join();
         }
-
 
         return  utilisateurRepository.save(user);
     }
