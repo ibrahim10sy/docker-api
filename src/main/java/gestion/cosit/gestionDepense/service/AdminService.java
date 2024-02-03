@@ -39,8 +39,8 @@ public class AdminService {
             // Générer un nom de fichier unique
             String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFileImage.getOriginalFilename());
 
-            Path uploadPath = Paths.get(UPLOAD_DIRECTORY);
-            Path filePath = uploadPath.resolve(fileName);
+            String imageUploadDirectory = "uploads"; // Chemin relatif dans le répertoire du projet
+            Path imageRootLocation = Paths.get(imageUploadDirectory);
 
             // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
             ResponseEntity<String> uploadResponse = fileService.upload(multipartFileImage, fileName);
