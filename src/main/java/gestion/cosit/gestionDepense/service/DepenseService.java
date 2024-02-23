@@ -59,8 +59,8 @@ public class DepenseService {
             // Générer un nom de fichier unique
             String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFileImage.getOriginalFilename());
 
-            String imageUploadDirectory = "uploads"; // Chemin relatif dans le répertoire du projet
-            Path imageRootLocation = Paths.get(imageUploadDirectory);
+//            String imageUploadDirectory = "uploads"; // Chemin relatif dans le répertoire du projet
+//            Path imageRootLocation = Paths.get(imageUploadDirectory);
 
             // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
             ResponseEntity<String> uploadResponse = fileService.upload(multipartFileImage, fileName);
@@ -221,29 +221,55 @@ public Depense saveDepenseByUser(Depense depense, MultipartFile multipartFileIma
 
     return depense;
 }
-    @Transactional
-    public Depense validateDepenseByAdmin(Long depenseId) throws Exception {
-        try {
-            Depense depense = depenseRepository.findById(depenseId)
-                    .orElseThrow(() -> new NotFoundException("Dépense non trouvée"));
-            Budget budget = depense.getBudget();
-            depense.setAutorisationAdmin(true);
-            if (depense.getMontantDepense() > budget.getMontantRestant()) {
-                throw new BadRequestException("Le montant de la dépense ne doit pas être supérieur à celui du montant restant du budget");
-            } else if (budget.getMontantRestant() == 0) {
-                throw new BadRequestException("Le montant restant du budget est atteint");
-            }
-            depenseRepository.save(depense);
-            System.out.println("Validation dans le ser depenses");
-            sendNotifService.approuverDemandeByAdmin(depense);
-            System.out.println("Fin Validation dans le ser depense");
-            budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
-            budgetRepository.save(budget);
-            return depense;
-        } catch (Exception e) {
-            throw new Exception("Erreur lors de l'approbation de la demande : " + e.getMessage());
+//    @Transactional
+//    public Depense validateDepenseByAdmin(Long depenseId) throws Exception {
+//        try {
+//            Depense depense = depenseRepository.findById(depenseId)
+//                    .orElseThrow(() -> new NotFoundException("Dépense non trouvée"));
+//            Budget budget = depense.getBudget();
+//            depense.setAutorisationAdmin(true);
+//            if (depense.getMontantDepense() > budget.getMontantRestant()) {
+//                throw new BadRequestException("Le montant de la dépense ne doit pas être supérieur à celui du montant restant du budget");
+//            } else if (budget.getMontantRestant() == 0) {
+//                throw new BadRequestException("Le montant restant du budget est atteint");
+//            }
+//            depenseRepository.save(depense);
+//            System.out.println("Validation dans le ser depenses");
+//            sendNotifService.approuverDemandeByAdmin(depense);
+//            System.out.println("Fin Validation dans le ser depense");
+//            budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
+//            budgetRepository.save(budget);
+//            return depense;
+//        } catch (Exception e) {
+//            throw new Exception("Erreur lors de l'approbation de la demande : " + e.getMessage());
+//        }
+//    }
+@Transactional
+public Depense validateDepenseByAdmin(Long depenseId) throws Exception {
+    try {
+        Depense depense = depenseRepository.findById(depenseId)
+                .orElseThrow(() -> new NotFoundException("Dépense non trouvée"));
+        Budget budget = depense.getBudget();
+        depense.setAutorisationAdmin(true);
+        if (depense.getMontantDepense() > budget.getMontantRestant()) {
+            throw new BadRequestException("Le montant de la dépense ne doit pas être supérieur à celui du montant restant du budget");
+        } else if (budget.getMontantRestant() == 0) {
+            throw new BadRequestException("Le montant restant du budget est atteint");
         }
+        depenseRepository.save(depense);
+        System.out.println("Validation dans le ser depenses");
+        budget.setMontantRestant(budget.getMontantRestant() - depense.getMontantDepense());
+        budgetRepository.save(budget);
+
+        // Envoi de l'email après avoir complètement validé la dépense
+        sendNotifService.approuverDemandeByAdmin(depense);
+        System.out.println("Fin Validation dans le ser depense");
+
+        return depense;
+    } catch (Exception e) {
+        throw new Exception("Erreur lors de l'approbation de la demande : " + e.getMessage());
     }
+}
 
 
     public Depense saveDepenseByAdmin(Depense depense , MultipartFile multipartFileImage) throws Exception {

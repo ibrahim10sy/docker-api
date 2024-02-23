@@ -32,15 +32,15 @@ public class AdminService {
     FileService fileService;
     //création de admin
 
-    private static final String UPLOAD_DIRECTORY = "src/main/resources/images";
+//    private static final String UPLOAD_DIRECTORY = "src/main/resources/images";
     @Async("asyncExecutor")
     public CompletableFuture<String> uploaderImageAsync(Admin admin, MultipartFile multipartFileImage) {
         try {
             // Générer un nom de fichier unique
             String fileName = UUID.randomUUID().toString() + fileService.getExtension(multipartFileImage.getOriginalFilename());
 
-            String imageUploadDirectory = "uploads"; // Chemin relatif dans le répertoire du projet
-            Path imageRootLocation = Paths.get(imageUploadDirectory);
+//            String imageUploadDirectory = "uploads"; // Chemin relatif dans le répertoire du projet
+//            Path imageRootLocation = Paths.get(imageUploadDirectory);
 
             // Enregistrer l'image dans Firebase Storage et obtenir l'URL de téléchargement
             ResponseEntity<String> uploadResponse = fileService.upload(multipartFileImage, fileName);

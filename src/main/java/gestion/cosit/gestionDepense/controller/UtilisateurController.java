@@ -21,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @RestController
 @CrossOrigin
-@RequestMapping("/utilisateur")
+@RequestMapping("/api-depense/utilisateur")
 public class UtilisateurController {
 
     private UtilisateurService utilisateurService;

@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/parametre")
+@RequestMapping("/api-depense/parametre")
 public class ParametreDepenseController {
 
     @Autowired

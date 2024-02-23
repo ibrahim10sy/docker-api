@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/Budget")
+@RequestMapping("/api-depense/Budget")
 public class BudgetController {
 
     @Autowired

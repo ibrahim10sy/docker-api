@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/Bureau")
+@RequestMapping("/api-depense/Bureau")
 public class BureauController {
 
     @Autowired

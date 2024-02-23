@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/SousCategorie")
+@RequestMapping("/api-depense/SousCategorie")
 public class SousCategorieController {
 
     @Autowired

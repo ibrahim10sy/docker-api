@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/procedure")
+@RequestMapping("/api-depense/procedure")
 public class ProcedureController {
 
     @Autowired

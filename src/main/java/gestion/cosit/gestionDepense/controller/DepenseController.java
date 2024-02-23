@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/Depenses")
+@RequestMapping("/api-depense/Depenses")
 public class DepenseController {
 
     @Autowired
