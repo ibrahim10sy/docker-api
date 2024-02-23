@@ -37,7 +37,7 @@ public class SendNotifService {
     @Autowired
     private DepenseRepository depenseRepository;
 
-    @Value("cosit162@gmail.com")
+    @Value("ibrahim20000sy@gmail.com")
     String sender;
 
 
